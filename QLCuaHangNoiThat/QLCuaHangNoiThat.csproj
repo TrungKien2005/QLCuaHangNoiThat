@@ -115,7 +115,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
-    <Compile Include="Database\DbConnection.cs" />
+    <Compile Include="DataAccess\DatabaseHelper.cs" />
     <Compile Include="Forms\FormMain.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -125,11 +125,48 @@
     <Compile Include="Models\SanPham.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\SanPhamRepository.cs" />
+    <Compile Include="Repositories\TaiChinhRepository.cs" />
+    <Compile Include="UserControls\UC_BaoCaoThongKe.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserControls\UC_BaoCaoThongKe.Designer.cs">
+      <DependentUpon>UC_BaoCaoThongKe.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\UC_QuanLyBanHang.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserControls\UC_QuanLyBanHang.Designer.cs">
+      <DependentUpon>UC_QuanLyBanHang.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\UC_QuanLyKhachHang.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserControls\UC_QuanLyKhachHang.Designer.cs">
+      <DependentUpon>UC_QuanLyKhachHang.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\UC_QuanLyNhanVien.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserControls\UC_QuanLyNhanVien.Designer.cs">
+      <DependentUpon>UC_QuanLyNhanVien.cs</DependentUpon>
+    </Compile>
     <Compile Include="UserControls\UC_QuanLySanPham.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="UserControls\UC_QuanLySanPham.Designer.cs">
       <DependentUpon>UC_QuanLySanPham.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\UC_QuanLyKho.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserControls\UC_QuanLyKho.Designer.cs">
+      <DependentUpon>UC_QuanLyKho.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\UC_TaiChinh.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserControls\UC_TaiChinh.Designer.cs">
+      <DependentUpon>UC_TaiChinh.cs</DependentUpon>
     </Compile>
     <EmbeddedResource Include="Forms\FormMain.resx">
       <DependentUpon>FormMain.cs</DependentUpon>
