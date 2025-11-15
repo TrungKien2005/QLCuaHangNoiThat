@@ -2,11 +2,18 @@
 {
     public class SanPham
     {
-        public string MaSP { get; set; }
-        public string TenSP { get; set; }
-        public decimal Gia { get; set; }
-        public int SoLuong { get; set; }
-        public string DanhMuc { get; set; }
+        public int MaSanPham { get; set; }
+        public string TenSanPham { get; set; }
+        public decimal GiaBan { get; set; }
+        public int SoLuongTon { get; set; }
         public string MoTa { get; set; }
+        public int MaDanhMuc { get; set; }
+        public int? MaNhaCungCap { get; set; }
+        public string SKU { get; set; }
+        public decimal GiaNhap { get; set; }
+        public string HinhAnhURL { get; set; }
+        public bool DangKinhDoanh { get; set; }
+        public string TenDanhMuc { get; set; }
+        public string TenNhaCungCap { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Drawing;
 using System.Windows.Forms;
 using QLCuaHangNoiThat.Models;
 using QLCuaHangNoiThat.Repositories;
@@ -13,6 +14,19 @@ namespace QLCuaHangNoiThat.UserControls
         public UC_QuanLySanPham()
         {
             InitializeComponent();
+            InitializePlaceholder();
+            InitializeEvents();
+        }
+
+        // THÊM PHƯƠNG THỨC NÀY VÀO ĐÂY
+        private void InitializeEvents()
+        {
+            this.btnThem.Click += new System.EventHandler(this.btnThem_Click);
+            this.btnSua.Click += new System.EventHandler(this.btnSua_Click);
+            this.btnXoa.Click += new System.EventHandler(this.btnXoa_Click);
+            this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
+            this.dataGridView1.SelectionChanged += new System.EventHandler(this.dataGridView1_SelectionChanged);
+            this.txtTimKiem.TextChanged += new System.EventHandler(this.txtTimKiem_TextChanged);
         }
 
         private void UC_QuanLySanPham_Load(object sender, EventArgs e)
@@ -24,7 +38,16 @@ namespace QLCuaHangNoiThat.UserControls
         {
             try
             {
-                dataGridView1.DataSource = _repo.GetAll();
+                DataTable dt = _repo.GetAll();
+
+                // Đổi tên cột để khớp với UI
+                if (dt.Columns.Contains("MaSanPham")) dt.Columns["MaSanPham"].ColumnName = "MaSP";
+                if (dt.Columns.Contains("TenSanPham")) dt.Columns["TenSanPham"].ColumnName = "TenSP";
+                if (dt.Columns.Contains("GiaBan")) dt.Columns["GiaBan"].ColumnName = "Gia";
+                if (dt.Columns.Contains("SoLuongTon")) dt.Columns["SoLuongTon"].ColumnName = "SoLuong";
+                if (dt.Columns.Contains("TenDanhMuc")) dt.Columns["TenDanhMuc"].ColumnName = "DanhMuc";
+
+                dataGridView1.DataSource = dt;
                 dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             }
             catch (Exception ex)
@@ -39,16 +62,16 @@ namespace QLCuaHangNoiThat.UserControls
             try
             {
                 DataTable dt = new DataTable();
-                dt.Columns.Add("MaSP", typeof(string));
+                dt.Columns.Add("MaSP", typeof(int));
                 dt.Columns.Add("TenSP", typeof(string));
                 dt.Columns.Add("Gia", typeof(decimal));
                 dt.Columns.Add("SoLuong", typeof(int));
                 dt.Columns.Add("DanhMuc", typeof(string));
                 dt.Columns.Add("MoTa", typeof(string));
 
-                dt.Rows.Add("SP001", "Ghế Sofa Gỗ", 5000000, 10, "Phòng khách", "Ghế sofa gỗ cao cấp");
-                dt.Rows.Add("SP002", "Bàn Ăn 6 Ghế", 3500000, 5, "Phòng ăn", "Bàn ăn gỗ 6 chỗ ngồi");
-                dt.Rows.Add("SP003", "Giường Ngủ Queen", 8000000, 3, "Phòng ngủ", "Giường ngủ size Queen");
+                dt.Rows.Add(1, "Ghế Sofa Gỗ", 5000000, 10, "Phòng khách", "Ghế sofa gỗ cao cấp");
+                dt.Rows.Add(2, "Bàn Ăn 6 Ghế", 3500000, 5, "Phòng ăn", "Bàn ăn gỗ 6 chỗ ngồi");
+                dt.Rows.Add(3, "Giường Ngủ Queen", 8000000, 3, "Phòng ngủ", "Giường ngủ size Queen");
 
                 dataGridView1.DataSource = dt;
                 dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
@@ -81,14 +104,16 @@ namespace QLCuaHangNoiThat.UserControls
             {
                 if (!ValidateInputs()) return;
 
+                // Tạo đối tượng SanPham mới với Model thực tế
                 SanPham sp = new SanPham()
                 {
-                    MaSP = txtMaSP.Text.Trim(),
-                    TenSP = txtTenSP.Text.Trim(),
-                    Gia = decimal.Parse(txtGia.Text.Trim()),
-                    SoLuong = int.Parse(txtSoLuong.Text.Trim()),
-                    DanhMuc = txtDanhMuc.Text.Trim(),
-                    MoTa = txtMoTa.Text.Trim()
+                    TenSanPham = txtTenSP.Text.Trim(),
+                    GiaBan = decimal.Parse(txtGia.Text.Trim()),
+                    SoLuongTon = int.Parse(txtSoLuong.Text.Trim()),
+                    MoTa = txtMoTa.Text.Trim(),
+                    MaDanhMuc = GetMaDanhMucByName(txtDanhMuc.Text.Trim()), // Cần tạo hàm này
+                    GiaNhap = decimal.Parse(txtGia.Text.Trim()) * 0.7m, // Giá nhập = 70% giá bán
+                    DangKinhDoanh = true
                 };
 
                 if (_repo.Add(sp))
@@ -118,12 +143,12 @@ namespace QLCuaHangNoiThat.UserControls
 
                 SanPham sp = new SanPham()
                 {
-                    MaSP = txtMaSP.Text.Trim(),
-                    TenSP = txtTenSP.Text.Trim(),
-                    Gia = decimal.Parse(txtGia.Text.Trim()),
-                    SoLuong = int.Parse(txtSoLuong.Text.Trim()),
-                    DanhMuc = txtDanhMuc.Text.Trim(),
-                    MoTa = txtMoTa.Text.Trim()
+                    MaSanPham = int.Parse(txtMaSP.Text.Trim()),
+                    TenSanPham = txtTenSP.Text.Trim(),
+                    GiaBan = decimal.Parse(txtGia.Text.Trim()),
+                    SoLuongTon = int.Parse(txtSoLuong.Text.Trim()),
+                    MoTa = txtMoTa.Text.Trim(),
+                    MaDanhMuc = GetMaDanhMucByName(txtDanhMuc.Text.Trim())
                 };
 
                 if (_repo.Update(sp))
@@ -188,13 +213,21 @@ namespace QLCuaHangNoiThat.UserControls
             try
             {
                 string keyword = txtTimKiem.Text.Trim();
-                if (string.IsNullOrEmpty(keyword))
+                if (string.IsNullOrEmpty(keyword) || keyword == "Tìm kiếm sản phẩm...")
                 {
                     LoadData();
                 }
                 else
                 {
                     DataTable searchResult = _repo.Search(keyword);
+
+                    // Đổi tên cột cho kết quả tìm kiếm
+                    if (searchResult.Columns.Contains("MaSanPham")) searchResult.Columns["MaSanPham"].ColumnName = "MaSP";
+                    if (searchResult.Columns.Contains("TenSanPham")) searchResult.Columns["TenSanPham"].ColumnName = "TenSP";
+                    if (searchResult.Columns.Contains("GiaBan")) searchResult.Columns["GiaBan"].ColumnName = "Gia";
+                    if (searchResult.Columns.Contains("SoLuongTon")) searchResult.Columns["SoLuongTon"].ColumnName = "SoLuong";
+                    if (searchResult.Columns.Contains("TenDanhMuc")) searchResult.Columns["TenDanhMuc"].ColumnName = "DanhMuc";
+
                     dataGridView1.DataSource = searchResult;
 
                     if (searchResult.Rows.Count == 0)
@@ -222,13 +255,6 @@ namespace QLCuaHangNoiThat.UserControls
 
         private bool ValidateInputs()
         {
-            if (string.IsNullOrEmpty(txtMaSP.Text))
-            {
-                MessageBox.Show("Vui lòng nhập mã sản phẩm!");
-                txtMaSP.Focus();
-                return false;
-            }
-
             if (string.IsNullOrEmpty(txtTenSP.Text))
             {
                 MessageBox.Show("Vui lòng nhập tên sản phẩm!");
@@ -251,6 +277,50 @@ namespace QLCuaHangNoiThat.UserControls
             }
 
             return true;
+        }
+
+        // Hàm hỗ trợ: Lấy MaDanhMuc từ tên danh mục
+        private int GetMaDanhMucByName(string tenDanhMuc)
+        {
+            // Tạm thời trả về giá trị mặc định
+            // Bạn có thể tạo Repository cho DanhMuc để lấy chính xác
+            switch (tenDanhMuc.ToLower())
+            {
+                case "phòng khách": return 1;
+                case "phòng ngủ": return 2;
+                case "phòng bếp": return 3;
+                default: return 1; // Mặc định là Phòng khách
+            }
+        }
+
+        private void InitializePlaceholder()
+        {
+            // Code placeholder giữ nguyên
+            txtTimKiem.Text = "Tìm kiếm sản phẩm...";
+            txtTimKiem.ForeColor = Color.Gray;
+
+            txtTimKiem.GotFocus += (s, e) =>
+            {
+                if (txtTimKiem.Text == "Tìm kiếm sản phẩm...")
+                {
+                    txtTimKiem.Text = "";
+                    txtTimKiem.ForeColor = SystemColors.WindowText;
+                }
+            };
+
+            txtTimKiem.LostFocus += (s, e) =>
+            {
+                if (string.IsNullOrWhiteSpace(txtTimKiem.Text))
+                {
+                    txtTimKiem.Text = "Tìm kiếm sản phẩm...";
+                    txtTimKiem.ForeColor = Color.Gray;
+                }
+            };
+        }
+
+        private void btnRefresh_Click_1(object sender, EventArgs e)
+        {
+
         }
     }
 }

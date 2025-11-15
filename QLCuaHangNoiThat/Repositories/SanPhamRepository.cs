@@ -17,10 +17,19 @@ namespace QLCuaHangNoiThat.Repositories
                 {
                     conn.Open();
 
-                    // ✅ KIỂM TRA VÀ TẠO BẢNG NẾU CHƯA CÓ
-                    EnsureTableExists(conn);
+                    string query = @"
+                        SELECT 
+                            sp.MaSanPham,
+                            sp.TenSanPham, 
+                            sp.GiaBan,
+                            sp.SoLuongTon,
+                            sp.MoTa,
+                            dm.TenDanhMuc,
+                            sp.SKU
+                        FROM sanpham sp
+                        LEFT JOIN danhmuc dm ON sp.MaDanhMuc = dm.MaDanhMuc
+                        ORDER BY sp.MaSanPham";
 
-                    string query = "SELECT * FROM SanPham ORDER BY MaSP";
                     MySqlCommand cmd = new MySqlCommand(query, conn);
                     MySqlDataAdapter da = new MySqlDataAdapter(cmd);
                     da.Fill(dt);
@@ -33,64 +42,6 @@ namespace QLCuaHangNoiThat.Repositories
             return dt;
         }
 
-        // ✅ PHƯƠNG THỨC KIỂM TRA VÀ TẠO BẢNG
-        private void EnsureTableExists(MySqlConnection conn)
-        {
-            try
-            {
-                // Kiểm tra xem bảng có tồn tại không
-                string checkTableQuery = "SHOW TABLES LIKE 'SanPham'";
-                MySqlCommand checkCmd = new MySqlCommand(checkTableQuery, conn);
-                object result = checkCmd.ExecuteScalar();
-
-                if (result == null)
-                {
-                    // Tạo bảng nếu chưa tồn tại
-                    string createTableQuery = @"
-                        CREATE TABLE SanPham (
-                            MaSP VARCHAR(50) PRIMARY KEY,
-                            TenSP VARCHAR(100) NOT NULL,
-                            Gia DECIMAL(18,2) NOT NULL,
-                            SoLuong INT NOT NULL,
-                            DanhMuc VARCHAR(50),
-                            MoTa TEXT
-                        )";
-
-                    MySqlCommand createCmd = new MySqlCommand(createTableQuery, conn);
-                    createCmd.ExecuteNonQuery();
-
-                    // Thêm dữ liệu mẫu
-                    InsertSampleData(conn);
-
-                    Console.WriteLine("✅ Đã tạo bảng SanPham và thêm dữ liệu mẫu!");
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Lỗi khi kiểm tra/tạo bảng: {ex.Message}");
-            }
-        }
-
-        // ✅ THÊM DỮ LIỆU MẪU
-        private void InsertSampleData(MySqlConnection conn)
-        {
-            try
-            {
-                string insertQuery = @"
-                    INSERT INTO SanPham (MaSP, TenSP, Gia, SoLuong, DanhMuc, MoTa) VALUES
-                    ('SP001', 'Ghế Sofa Gỗ', 5000000, 10, 'Phòng khách', 'Ghế sofa gỗ cao cấp'),
-                    ('SP002', 'Bàn Ăn 6 Ghế', 3500000, 5, 'Phòng ăn', 'Bàn ăn gỗ 6 chỗ ngồi'),
-                    ('SP003', 'Giường Ngủ Queen', 8000000, 3, 'Phòng ngủ', 'Giường ngủ size Queen')";
-
-                MySqlCommand insertCmd = new MySqlCommand(insertQuery, conn);
-                insertCmd.ExecuteNonQuery();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"⚠️ Không thể thêm dữ liệu mẫu: {ex.Message}");
-            }
-        }
-
         public bool Add(SanPham sp)
         {
             using (MySqlConnection conn = DatabaseHelper.GetConnection())
@@ -98,18 +49,20 @@ namespace QLCuaHangNoiThat.Repositories
                 try
                 {
                     conn.Open();
-                    EnsureTableExists(conn); // ✅ Đảm bảo bảng tồn tại
 
-                    string query = @"INSERT INTO SanPham (MaSP, TenSP, Gia, SoLuong, DanhMuc, MoTa) 
-                                   VALUES (@MaSP, @TenSP, @Gia, @SoLuong, @DanhMuc, @MoTa)";
+                    string query = @"INSERT INTO sanpham 
+                        (TenSanPham, MaDanhMuc, SKU, MoTa, GiaNhap, GiaBan, SoLuongTon, DangKinhDoanh) 
+                        VALUES (@TenSanPham, @MaDanhMuc, @SKU, @MoTa, @GiaNhap, @GiaBan, @SoLuongTon, 1)";
 
                     MySqlCommand cmd = new MySqlCommand(query, conn);
-                    cmd.Parameters.AddWithValue("@MaSP", sp.MaSP);
-                    cmd.Parameters.AddWithValue("@TenSP", sp.TenSP);
-                    cmd.Parameters.AddWithValue("@Gia", sp.Gia);
-                    cmd.Parameters.AddWithValue("@SoLuong", sp.SoLuong);
-                    cmd.Parameters.AddWithValue("@DanhMuc", sp.DanhMuc);
+
+                    cmd.Parameters.AddWithValue("@TenSanPham", sp.TenSanPham);
+                    cmd.Parameters.AddWithValue("@MaDanhMuc", sp.MaDanhMuc);
+                    cmd.Parameters.AddWithValue("@SKU", GenerateSKU(sp.TenSanPham));
                     cmd.Parameters.AddWithValue("@MoTa", sp.MoTa);
+                    cmd.Parameters.AddWithValue("@GiaNhap", sp.GiaNhap);
+                    cmd.Parameters.AddWithValue("@GiaBan", sp.GiaBan);
+                    cmd.Parameters.AddWithValue("@SoLuongTon", sp.SoLuongTon);
 
                     int result = cmd.ExecuteNonQuery();
                     return result > 0;
@@ -117,13 +70,111 @@ namespace QLCuaHangNoiThat.Repositories
                 catch (MySqlException ex)
                 {
                     if (ex.Number == 1062)
-                        throw new Exception("Mã sản phẩm đã tồn tại!");
+                        throw new Exception("SKU sản phẩm đã tồn tại!");
                     else
                         throw new Exception($"Lỗi khi thêm sản phẩm: {ex.Message}");
                 }
             }
         }
 
-        // ... các phương thức Update, Delete, Search giữ nguyên
+        public bool Update(SanPham sp)
+        {
+            using (MySqlConnection conn = DatabaseHelper.GetConnection())
+            {
+                try
+                {
+                    conn.Open();
+
+                    string query = @"UPDATE sanpham 
+                                   SET TenSanPham = @TenSanPham, 
+                                       GiaBan = @GiaBan, 
+                                       SoLuongTon = @SoLuongTon,
+                                       MoTa = @MoTa,
+                                       MaDanhMuc = @MaDanhMuc
+                                   WHERE MaSanPham = @MaSanPham";
+
+                    MySqlCommand cmd = new MySqlCommand(query, conn);
+
+                    cmd.Parameters.AddWithValue("@MaSanPham", sp.MaSanPham);
+                    cmd.Parameters.AddWithValue("@TenSanPham", sp.TenSanPham);
+                    cmd.Parameters.AddWithValue("@GiaBan", sp.GiaBan);
+                    cmd.Parameters.AddWithValue("@SoLuongTon", sp.SoLuongTon);
+                    cmd.Parameters.AddWithValue("@MoTa", sp.MoTa);
+                    cmd.Parameters.AddWithValue("@MaDanhMuc", sp.MaDanhMuc);
+
+                    int result = cmd.ExecuteNonQuery();
+                    return result > 0;
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"Lỗi khi cập nhật sản phẩm: {ex.Message}");
+                }
+            }
+        }
+
+        public bool Delete(string maSP)
+        {
+            using (MySqlConnection conn = DatabaseHelper.GetConnection())
+            {
+                try
+                {
+                    conn.Open();
+
+                    string query = "DELETE FROM sanpham WHERE MaSanPham = @MaSanPham";
+                    MySqlCommand cmd = new MySqlCommand(query, conn);
+                    cmd.Parameters.AddWithValue("@MaSanPham", int.Parse(maSP));
+
+                    int result = cmd.ExecuteNonQuery();
+                    return result > 0;
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"Lỗi khi xóa sản phẩm: {ex.Message}");
+                }
+            }
+        }
+
+        public DataTable Search(string keyword)
+        {
+            DataTable dt = new DataTable();
+            using (MySqlConnection conn = DatabaseHelper.GetConnection())
+            {
+                try
+                {
+                    conn.Open();
+
+                    string query = @"
+                        SELECT 
+                            sp.MaSanPham,
+                            sp.TenSanPham,
+                            sp.GiaBan,
+                            sp.SoLuongTon,
+                            sp.MoTa,
+                            dm.TenDanhMuc
+                        FROM sanpham sp
+                        LEFT JOIN danhmuc dm ON sp.MaDanhMuc = dm.MaDanhMuc
+                        WHERE sp.TenSanPham LIKE @Keyword 
+                           OR dm.TenDanhMuc LIKE @Keyword
+                           OR sp.MoTa LIKE @Keyword
+                        ORDER BY sp.MaSanPham";
+
+                    MySqlCommand cmd = new MySqlCommand(query, conn);
+                    cmd.Parameters.AddWithValue("@Keyword", $"%{keyword}%");
+
+                    MySqlDataAdapter da = new MySqlDataAdapter(cmd);
+                    da.Fill(dt);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"Lỗi khi tìm kiếm sản phẩm: {ex.Message}");
+                }
+            }
+            return dt;
+        }
+
+        private string GenerateSKU(string tenSP)
+        {
+            return "SP" + DateTime.Now.ToString("yyyyMMddHHmmss");
+        }
     }
 }
