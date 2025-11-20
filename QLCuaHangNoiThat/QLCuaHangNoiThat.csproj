@@ -114,6 +114,30 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Forms\capnhatttdh.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\capnhatttdh.Designer.cs">
+      <DependentUpon>capnhatttdh.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\inhoadon1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\inhoadon1.Designer.cs">
+      <DependentUpon>inhoadon1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\dskh.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\dskh.Designer.cs">
+      <DependentUpon>dskh.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\chitiethd.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\chitiethd.Designer.cs">
+      <DependentUpon>chitiethd.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="DataAccess\DatabaseHelper.cs" />
     <Compile Include="Forms\FormMain.cs">
@@ -132,12 +156,6 @@
     </Compile>
     <Compile Include="UserControls\UC_BaoCaoThongKe.Designer.cs">
       <DependentUpon>UC_BaoCaoThongKe.cs</DependentUpon>
-    </Compile>
-    <Compile Include="UserControls\UC_QuanLyBanHang.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="UserControls\UC_QuanLyBanHang.Designer.cs">
-      <DependentUpon>UC_QuanLyBanHang.cs</DependentUpon>
     </Compile>
     <Compile Include="UserControls\UC_QuanLyKhachHang.cs">
       <SubType>UserControl</SubType>
@@ -181,6 +199,24 @@
     <Compile Include="UserControls\UC_TrangChu.Designer.cs">
       <DependentUpon>UC_TrangChu.cs</DependentUpon>
     </Compile>
+    <Compile Include="UserControls\UC_QuanLyBanHang.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserControls\UC_QuanLyBanHang.Designer.cs">
+      <DependentUpon>UC_QuanLyBanHang.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="Forms\capnhatttdh.resx">
+      <DependentUpon>capnhatttdh.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\chitiethd.resx">
+      <DependentUpon>chitiethd.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\inhoadon1.resx">
+      <DependentUpon>inhoadon1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\dskh.resx">
+      <DependentUpon>dskh.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormMain.resx">
       <DependentUpon>FormMain.cs</DependentUpon>
     </EmbeddedResource>
@@ -193,6 +229,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="UserControls\UC_QuanLyBanHang.resx">
+      <DependentUpon>UC_QuanLyBanHang.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UserControls\UC_QuanLySanPham.resx">
       <DependentUpon>UC_QuanLySanPham.cs</DependentUpon>
     </EmbeddedResource>

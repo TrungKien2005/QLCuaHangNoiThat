@@ -6,7 +6,7 @@ namespace QLCuaHangNoiThat.DataAccess
     public static class DatabaseHelper
     {
         private static readonly string connectionString =
-            "Server=localhost;Port=3306;Database=qlcuahangnoithat;" +
+            "Server=localhost;Port=3306;Database=db_qlnoithat;" +
             "User ID=root;Password=;SslMode=Disabled;" +
             "Charset=utf8mb4;ConnectionTimeout=30;Pooling=true;";
 
