@@ -35,21 +35,21 @@
             this.username = new System.Windows.Forms.TextBox();
             this.userpic = new System.Windows.Forms.PictureBox();
             this.panel3 = new System.Windows.Forms.Panel();
+            this.showpic = new System.Windows.Forms.PictureBox();
+            this.hidepic = new System.Windows.Forms.PictureBox();
             this.panel4 = new System.Windows.Forms.Panel();
             this.passuser = new System.Windows.Forms.TextBox();
             this.lockpic = new System.Windows.Forms.PictureBox();
-            this.showpic = new System.Windows.Forms.PictureBox();
             this.blogin = new System.Windows.Forms.Button();
             this.clear = new System.Windows.Forms.Label();
             this.exit = new System.Windows.Forms.Label();
-            this.hidepic = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.userpic)).BeginInit();
             this.panel3.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.lockpic)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.showpic)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.hidepic)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.lockpic)).BeginInit();
             this.SuspendLayout();
             // 
             // pictureBox1
@@ -92,10 +92,11 @@
             // username
             // 
             this.username.BackColor = System.Drawing.SystemColors.Control;
+            this.username.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.username.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.username.Location = new System.Drawing.Point(67, 7);
             this.username.Name = "username";
-            this.username.Size = new System.Drawing.Size(471, 44);
+            this.username.Size = new System.Drawing.Size(471, 37);
             this.username.TabIndex = 1;
             // 
             // userpic
@@ -118,6 +119,24 @@
             this.panel3.Size = new System.Drawing.Size(541, 56);
             this.panel3.TabIndex = 3;
             // 
+            // showpic
+            // 
+            this.showpic.Location = new System.Drawing.Point(477, 8);
+            this.showpic.Name = "showpic";
+            this.showpic.Size = new System.Drawing.Size(61, 40);
+            this.showpic.TabIndex = 4;
+            this.showpic.TabStop = false;
+            this.showpic.Click += new System.EventHandler(this.showpic_Click);
+            // 
+            // hidepic
+            // 
+            this.hidepic.Location = new System.Drawing.Point(477, 1);
+            this.hidepic.Name = "hidepic";
+            this.hidepic.Size = new System.Drawing.Size(64, 47);
+            this.hidepic.TabIndex = 7;
+            this.hidepic.TabStop = false;
+            this.hidepic.Click += new System.EventHandler(this.hidepic_Click);
+            // 
             // panel4
             // 
             this.panel4.BackColor = System.Drawing.Color.DarkOrange;
@@ -129,11 +148,12 @@
             // passuser
             // 
             this.passuser.BackColor = System.Drawing.SystemColors.Control;
+            this.passuser.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.passuser.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.passuser.Location = new System.Drawing.Point(67, 7);
             this.passuser.Name = "passuser";
             this.passuser.PasswordChar = '*';
-            this.passuser.Size = new System.Drawing.Size(468, 44);
+            this.passuser.Size = new System.Drawing.Size(468, 37);
             this.passuser.TabIndex = 1;
             // 
             // lockpic
@@ -143,15 +163,6 @@
             this.lockpic.Size = new System.Drawing.Size(58, 48);
             this.lockpic.TabIndex = 0;
             this.lockpic.TabStop = false;
-            // 
-            // showpic
-            // 
-            this.showpic.Location = new System.Drawing.Point(477, 8);
-            this.showpic.Name = "showpic";
-            this.showpic.Size = new System.Drawing.Size(61, 40);
-            this.showpic.TabIndex = 4;
-            this.showpic.TabStop = false;
-            this.showpic.Click += new System.EventHandler(this.showpic_Click);
             // 
             // blogin
             // 
@@ -191,15 +202,6 @@
             this.exit.Text = "Exit";
             this.exit.Click += new System.EventHandler(this.exit_Click_1);
             // 
-            // hidepic
-            // 
-            this.hidepic.Location = new System.Drawing.Point(477, 1);
-            this.hidepic.Name = "hidepic";
-            this.hidepic.Size = new System.Drawing.Size(64, 47);
-            this.hidepic.TabIndex = 7;
-            this.hidepic.TabStop = false;
-            this.hidepic.Click += new System.EventHandler(this.hidepic_Click);
-            // 
             // login
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
@@ -220,9 +222,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.userpic)).EndInit();
             this.panel3.ResumeLayout(false);
             this.panel3.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.lockpic)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.showpic)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.hidepic)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.lockpic)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
