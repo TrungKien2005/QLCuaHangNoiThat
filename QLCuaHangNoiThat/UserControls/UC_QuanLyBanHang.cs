@@ -39,32 +39,10 @@ namespace QLCuaHangNoiThat.UserControls
         //}
 
 
-        private void HideOrderBtn()
-        {
-            if (this.Controls.ContainsKey("btnInhd"))
-            {
-                this.Controls["btnInhd"].Visible = false;
-            }
-            if (this.Controls.ContainsKey("btnchitiethd"))
-            {
-                this.Controls["btnchitiethd"].Visible = false;
-            }
-
-            maDonHangVuaTao = 0;
-        }
+      
 
 
-        private void ShowOrderBtn()
-        {
-            if (this.Controls.ContainsKey("btnInhd"))
-            {
-                this.Controls["btnInhd"].Visible = true;
-            }
-            if (this.Controls.ContainsKey("btnchitiethd"))
-            {
-                this.Controls["btnchitiethd"].Visible = true;
-            }
-        }
+       
         private void LoadCombox_idnv()
         {
             using (MySqlConnection conn = DatabaseHelper.GetConnection())
@@ -123,7 +101,6 @@ namespace QLCuaHangNoiThat.UserControls
         {
             LoadCombox_idnv();
             LoadCombox_ttsanpham();
-            HideOrderBtn();
             load_ds_dh();
         }
 
@@ -300,7 +277,6 @@ namespace QLCuaHangNoiThat.UserControls
                 LoadCombox_idnv();
                 LoadCombox_ttsanpham();
 
-                HideOrderBtn();
 
                 MessageBox.Show("✅ Làm mới dữ liệu thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
@@ -495,8 +471,8 @@ namespace QLCuaHangNoiThat.UserControls
                             MessageBoxButtons.OK,
                             MessageBoxIcon.Information);
 
-
-                        ShowOrderBtn();
+                        LoadCombox_ttsanpham();
+                        load_ds_dh();
 
                     }
                     catch (Exception ex)

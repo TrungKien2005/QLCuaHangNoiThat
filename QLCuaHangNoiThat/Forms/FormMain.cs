@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
+using QLCuaHangNoiThat.Forms;
 using QLCuaHangNoiThat.UserControls;
 
 namespace QLCuaHangNoiThat
@@ -191,7 +192,9 @@ namespace QLCuaHangNoiThat
 
             if (result == DialogResult.Yes)
             {
-                Application.Exit();
+                login log = new login();
+                log.Show();
+                this.Hide();
             }
         }
     }
