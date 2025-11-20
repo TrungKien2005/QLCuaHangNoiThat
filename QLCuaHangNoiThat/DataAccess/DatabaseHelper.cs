@@ -1,5 +1,6 @@
-﻿using System;
-using MySql.Data.MySqlClient;
+﻿using MySql.Data.MySqlClient;
+using System;
+using System.Data;
 
 namespace QLCuaHangNoiThat.DataAccess
 {
@@ -42,6 +43,22 @@ namespace QLCuaHangNoiThat.DataAccess
                     if (parameters != null)
                         command.Parameters.AddRange(parameters);
                     return command.ExecuteNonQuery();
+                }
+            }
+        }
+        public static DataTable ExecuteDataTable(string query, MySqlParameter[] parameters = null)
+        {
+            using (var connection = GetConnection())
+            {
+                // Sử dụng MySqlDataAdapter để fill DataTable
+                using (var adapter = new MySqlDataAdapter(query, connection))
+                {
+                    if (parameters != null)
+                        adapter.SelectCommand.Parameters.AddRange(parameters);
+
+                    DataTable dt = new DataTable();
+                    adapter.Fill(dt);
+                    return dt;
                 }
             }
         }
