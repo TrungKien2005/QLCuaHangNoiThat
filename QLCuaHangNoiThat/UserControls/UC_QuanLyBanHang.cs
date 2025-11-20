@@ -656,6 +656,13 @@ namespace QLCuaHangNoiThat.UserControls
                     return;
                 }
 
+
+                else if (trangThai == "Đang giao hàng"  || trangThai == "Hoàn thành")
+                {
+                    MessageBox.Show("Đơn hàng đang được giao hoặc đã hoàn tất, không thể hủy.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
                 // 3. Xác nhận
                 DialogResult result = MessageBox.Show(
                     $"Bạn có chắc muốn hủy đơn hàng {maDonHang} không?",
