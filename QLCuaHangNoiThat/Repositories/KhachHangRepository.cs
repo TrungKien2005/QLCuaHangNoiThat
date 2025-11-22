@@ -201,5 +201,108 @@ namespace QLCuaHangNoiThat.Repositories
             }
             return list;
         }
+        public List<ChiTietDonHangView> GetChiTietDonHangByMaDH_Separate(int maDonHang)
+        {
+            var chiTietList = new List<ChiTietDonHangView>();
+
+            using (MySqlConnection connection = DatabaseHelper.GetConnection())
+            {
+                connection.Open();
+
+                // Truy vấn JOIN: chitietdonhang (ct) VÀ sanpham (sp)
+                string queryChiTiet = @"
+            SELECT 
+                ct.SoLuong, ct.GiaBan, ct.ThanhTien, sp.TenSanPham 
+            FROM 
+                chitietdonhang ct
+            JOIN 
+                sanpham sp ON ct.MaSanPham = sp.MaSanPham
+            WHERE 
+                ct.MaDonHang = @MaDH";
+
+                MySqlCommand cmdChiTiet = new MySqlCommand(queryChiTiet, connection);
+                cmdChiTiet.Parameters.AddWithValue("@MaDH", maDonHang);
+
+                using (var readerChiTiet = cmdChiTiet.ExecuteReader())
+                {
+                    while (readerChiTiet.Read())
+                    {
+                        // Xử lý cột ThanhTien có thể NULL trong DB
+                        decimal? thanhTien = readerChiTiet.IsDBNull(readerChiTiet.GetOrdinal("ThanhTien"))
+                                                ? (decimal?)null
+                                                : readerChiTiet.GetDecimal("ThanhTien");
+
+                        chiTietList.Add(new ChiTietDonHangView
+                        {
+                            TenSanPham = readerChiTiet.GetString("TenSanPham"),
+                            SoLuong = readerChiTiet.GetInt32("SoLuong"),
+                            GiaBan = readerChiTiet.GetDecimal("GiaBan"),
+                            ThanhTien = thanhTien ?? 0m // Dùng 0 nếu giá trị NULL
+                        });
+                    }
+                }
+            }
+            return chiTietList;
+        }
+
+
+        // --- HÀM CHÍNH: Lấy Lịch sử Mua hàng theo MaKhachHang (Master) ---
+        public List<LichSuMuaHangView> GetLichSuMuaHangByMaKH(int maKhachHang)
+        {
+            var listLichSu = new List<LichSuMuaHangView>();
+
+            // Bước 1: Lấy danh sách Đơn hàng (Master)
+            // SỬ DỤNG TÊN CỘT CHÍNH XÁC: TongTien, NgayDatHang, TrangThai
+            string queryDonHang = @"
+        SELECT MaDonHang, NgayDatHang, TongTien, TrangThai 
+        FROM donhang 
+        WHERE MaKhachHang = @MaKH 
+        ORDER BY NgayDatHang DESC";
+
+            using (MySqlConnection connection = DatabaseHelper.GetConnection())
+            {
+                connection.Open();
+                MySqlCommand cmdDonHang = new MySqlCommand(queryDonHang, connection);
+                cmdDonHang.Parameters.AddWithValue("@MaKH", maKhachHang);
+
+                try
+                {
+                    using (var readerDonHang = cmdDonHang.ExecuteReader())
+                    {
+                        // Lấy chỉ số cột NgayDatHang để xử lý NULL
+                        int ngayDatHangIndex = readerDonHang.GetOrdinal("NgayDatHang");
+
+                        while (readerDonHang.Read())
+                        {
+                            listLichSu.Add(new LichSuMuaHangView
+                            {
+                                MaDonHang = readerDonHang.GetInt32("MaDonHang"),
+
+                                // Xử lý NgayDatHang có thể NULL
+                                NgayDatHang = readerDonHang.IsDBNull(ngayDatHangIndex)
+                                                ? (DateTime?)null
+                                                : readerDonHang.GetDateTime(ngayDatHangIndex),
+
+                                TongTien = readerDonHang.GetDecimal("TongTien"),
+                                TrangThai = readerDonHang.GetString("TrangThai")
+                            });
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("Lỗi khi tải đơn hàng của khách hàng từ CSDL.", ex);
+                }
+            }
+
+            // Bước 2: Tải Chi tiết cho mỗi đơn hàng (Detail)
+            foreach (var donHang in listLichSu)
+            {
+                // Gọi hàm trợ giúp để lấy chi tiết cho từng đơn hàng
+                donHang.ChiTiet = GetChiTietDonHangByMaDH_Separate(donHang.MaDonHang);
+            }
+
+            return listLichSu;
+        }
     }
 }

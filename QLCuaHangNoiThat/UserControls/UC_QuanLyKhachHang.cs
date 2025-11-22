@@ -1,10 +1,12 @@
 ﻿using MySql.Data.MySqlClient;
 using QLCuaHangNoiThat.Models;
+using QLCuaHangNoiThat.Properties;
 using QLCuaHangNoiThat.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
+using System.Resources;
 using System.Windows.Forms;
 
 namespace QLCuaHangNoiThat.UserControls
@@ -28,6 +30,7 @@ namespace QLCuaHangNoiThat.UserControls
             btnThem.Click += btnThem_Click;
             btnSua.Click += btnSua_Click;
             btnXoa.Click += btnXoa_Click;
+            btnXemLichSu.Click += btnXemLichSu_Click;
             dgvKhachHang.SelectionChanged += dgvKhachHang_SelectionChanged;
             txtTimKiem.TextChanged += txtTimKiem_TextChanged;
 
@@ -35,12 +38,14 @@ namespace QLCuaHangNoiThat.UserControls
             SetupButtonStyle(btnThem, Color.FromArgb(39, 174, 96));
             SetupButtonStyle(btnSua, Color.FromArgb(243, 156, 18));
             SetupButtonStyle(btnXoa, Color.FromArgb(231, 76, 60));
-
+            SetupButtonStyle(btnXemLichSu, Color.FromArgb(41, 128, 185));
             btnThem.Cursor = Cursors.Hand;
             btnSua.Cursor = Cursors.Hand;
             btnXoa.Cursor = Cursors.Hand;
             dgvKhachHang.Cursor = Cursors.Hand;
-
+            btnXemLichSu.Cursor = Cursors.Hand;
+            btnXemLichSu.MouseEnter += btnXemLichSu_MouseEnter;
+            btnXemLichSu.MouseLeave += btnXemLichSu_MouseLeave;
             SetupDataGridViewStyle();
             
 
@@ -48,7 +53,17 @@ namespace QLCuaHangNoiThat.UserControls
             txtNgayTao.TabStop = false;
             
         }
-       
+        private readonly Color PRIMARY_COLOR = Color.FromArgb(41, 128, 185);
+        private readonly Color HOVER_COLOR = Color.FromArgb(60, 141, 203);
+        private void btnXemLichSu_MouseEnter(object sender, EventArgs e)
+        {
+            btnXemLichSu.BackColor = HOVER_COLOR;
+        }
+
+        private void btnXemLichSu_MouseLeave(object sender, EventArgs e)
+        {
+            btnXemLichSu.BackColor = PRIMARY_COLOR;
+        }
         private void SetupButtonStyle(Button btn, Color backColor)
         {
             btn.FlatStyle = FlatStyle.Flat;
@@ -56,7 +71,26 @@ namespace QLCuaHangNoiThat.UserControls
             btn.ForeColor = Color.White;
             btn.FlatAppearance.BorderSize = 0;
             btn.Font = new Font("Segoe UI", 10F, FontStyle.Bold); // Nên thống nhất Font
-        }
+            if (btn.Name == "btnXemLichSu")
+            {
+                // 1. Gán Icon (giả sử tên resource là HistoryIcon)
+                // Thay Resources.HistoryIcon bằng tên tài nguyên bạn đã import
+              
+                // 2. Icon nằm ở bên trái
+                btn.ImageAlign = ContentAlignment.MiddleLeft;
+
+                // 3. Chữ nằm ở giữa bên phải
+                btn.TextAlign = ContentAlignment.MiddleCenter;
+
+                // 4. Thiết lập mối quan hệ giữa chữ và icon
+                // ImageAndText: Icon và chữ hiển thị cạnh nhau
+                btn.TextImageRelation = TextImageRelation.ImageBeforeText;
+
+                // 5. Thêm padding (khoảng đệm) để Icon không quá sát viền và chữ không quá sát Icon
+                // Padding(left, top, right, bottom)
+                btn.Padding = new Padding(10, 0, 10, 0);
+            }
+        }
         private void SetupDataGridViewStyle()
         {
             // --- 1. Loại bỏ đường viền/Hiệu ứng cũ ---
@@ -152,9 +186,56 @@ namespace QLCuaHangNoiThat.UserControls
                 MessageBox.Show("Lỗi tải khách hàng: " + ex.Message);
             }
         }
+        // Trong UC_QuanLyKhachHang.cs
 
+        private void btnXemLichSu_Click(object sender, EventArgs e)
+        {
+            // 💡 SỬA ĐIỀU KIỆN KIỂM TRA:
+            // Kiểm tra xem có dòng nào đang được người dùng CHỌN (SelectedRows) không.
+            if (dgvKhachHang.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Vui lòng chọn một khách hàng từ danh sách để xem lịch sử mua hàng.", "Thiếu thông tin");
+                return;
+            }
+
+            try
+            {
+                // 💡 LẤY DỮ LIỆU TỪ DÒNG ĐƯỢC CHỌN (SelectedRows[0])
+                // Lấy dòng đầu tiên trong tập hợp các dòng được chọn (vì SelectionMode là FullRowSelect và MultiSelect là false)
+                DataGridViewRow selectedDataRow = dgvKhachHang.SelectedRows[0];
+
+                // 1. Lấy đối tượng KhachHang đang được chọn từ DataGridView
+                KhachHang selectedKH = selectedDataRow.DataBoundItem as KhachHang;
+
+                // Kiểm tra an toàn, mặc dù SelectedRows[0] thường đảm bảo đã có dữ liệu
+                if (selectedKH == null) return;
+
+                int maKH = selectedKH.MaKhachHang;
+                // Ghép Ho và Ten để có tên đầy đủ
+                string tenKH = selectedKH.Ho + " " + selectedKH.Ten;
+
+                // 2. Gọi Repository để lấy lịch sử
+                List<LichSuMuaHangView> lichSu = _khachHangRepo.GetLichSuMuaHangByMaKH(maKH);
+
+                if (lichSu.Count == 0)
+                {
+                    MessageBox.Show($"Khách hàng {tenKH} chưa có đơn hàng nào.", "Không có dữ liệu");
+                    return;
+                }
+
+                // 3. Hiển thị Form chi tiết lịch sử
+                // Đảm bảo FormLichSuMuaHang được tham chiếu đúng namespace
+                using (var formLichSu = new QLCuaHangNoiThat.Forms.FormLichSuMuaHang(lichSu, maKH, tenKH))
+                {
+                    formLichSu.ShowDialog();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi khi tải lịch sử mua hàng: " + ex.Message, "Lỗi CSDL");
+            }
+        }
         // HÀM CREATE (Thêm Khách hàng)
-
         private void btnThem_Click(object sender, EventArgs e)
         {
             // Thêm kiểm tra bắt buộc
@@ -331,6 +412,7 @@ namespace QLCuaHangNoiThat.UserControls
         private void InitializeComponent()
         {
             this.pnlInput = new System.Windows.Forms.Panel();
+            this.btnXemLichSu = new System.Windows.Forms.Button();
             this.txtNgayTao = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
             this.txtTimKiem = new System.Windows.Forms.TextBox();
@@ -355,6 +437,7 @@ namespace QLCuaHangNoiThat.UserControls
             // 
             // pnlInput
             // 
+            this.pnlInput.Controls.Add(this.btnXemLichSu);
             this.pnlInput.Controls.Add(this.txtNgayTao);
             this.pnlInput.Controls.Add(this.label7);
             this.pnlInput.Controls.Add(this.txtTimKiem);
@@ -377,6 +460,16 @@ namespace QLCuaHangNoiThat.UserControls
             this.pnlInput.Name = "pnlInput";
             this.pnlInput.Size = new System.Drawing.Size(1057, 349);
             this.pnlInput.TabIndex = 0;
+            // 
+            // btnXemLichSu
+            // 
+            this.btnXemLichSu.Location = new System.Drawing.Point(789, 267);
+            this.btnXemLichSu.Name = "btnXemLichSu";
+            this.btnXemLichSu.Padding = new System.Windows.Forms.Padding(0, 10, 0, 10);
+            this.btnXemLichSu.Size = new System.Drawing.Size(113, 76);
+            this.btnXemLichSu.TabIndex = 8;
+            this.btnXemLichSu.Text = "Lịch Sử Mua Hàng";
+            this.btnXemLichSu.UseVisualStyleBackColor = true;
             // 
             // txtNgayTao
             // 
@@ -534,6 +627,7 @@ namespace QLCuaHangNoiThat.UserControls
             // 
             // dgvKhachHang
             // 
+            this.dgvKhachHang.BackgroundColor = System.Drawing.Color.White;
             this.dgvKhachHang.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvKhachHang.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgvKhachHang.Location = new System.Drawing.Point(0, 349);
@@ -582,7 +676,6 @@ namespace QLCuaHangNoiThat.UserControls
 
         private DataGridView dgvKhachHang;
         private TextBox txtNgayTao;
-
-        
-    }
+        private Button btnXemLichSu;
+    }
 }

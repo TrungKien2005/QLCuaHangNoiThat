@@ -77,6 +77,7 @@
             // dgvNhanVien
             // 
             this.dgvNhanVien.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvNhanVien.BackgroundColor = System.Drawing.Color.White;
             this.dgvNhanVien.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvNhanVien.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgvNhanVien.Location = new System.Drawing.Point(0, 294);
@@ -126,10 +127,22 @@
             this.panel1.TabIndex = 2;
             this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
             // 
+            // btnHuyLoc
+            // 
+            this.btnHuyLoc.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(107)))), ((int)(((byte)(114)))), ((int)(((byte)(128)))));
+            this.btnHuyLoc.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnHuyLoc.ForeColor = System.Drawing.Color.White;
+            this.btnHuyLoc.Location = new System.Drawing.Point(483, 236);
+            this.btnHuyLoc.Name = "btnHuyLoc";
+            this.btnHuyLoc.Size = new System.Drawing.Size(75, 30);
+            this.btnHuyLoc.TabIndex = 27;
+            this.btnHuyLoc.Text = "Hủy Lọc";
+            this.btnHuyLoc.UseVisualStyleBackColor = false;
+            // 
             // btnLoc
             // 
             this.btnLoc.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnLoc.Location = new System.Drawing.Point(366, 234);
+            this.btnLoc.Location = new System.Drawing.Point(366, 236);
             this.btnLoc.Name = "btnLoc";
             this.btnLoc.Size = new System.Drawing.Size(75, 30);
             this.btnLoc.TabIndex = 26;
@@ -182,12 +195,12 @@
             // 
             // dtpNgayVaoLam
             // 
+            this.dtpNgayVaoLam.Checked = false;
             this.dtpNgayVaoLam.CustomFormat = "MM/dd/yyyy";
             this.dtpNgayVaoLam.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
             this.dtpNgayVaoLam.Location = new System.Drawing.Point(109, 173);
             this.dtpNgayVaoLam.Name = "dtpNgayVaoLam";
             this.dtpNgayVaoLam.ShowCheckBox = true;
-            this.dtpNgayVaoLam.Checked = false;
             this.dtpNgayVaoLam.Size = new System.Drawing.Size(200, 30);
             this.dtpNgayVaoLam.TabIndex = 22;
             // 
@@ -394,18 +407,6 @@
             this.mySqlCommand1.Connection = null;
             this.mySqlCommand1.EnableCaching = false;
             this.mySqlCommand1.Transaction = null;
-            // 
-            // btnHuyLoc
-            // 
-            this.btnHuyLoc.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(107)))), ((int)(((byte)(114)))), ((int)(((byte)(128)))));
-            this.btnHuyLoc.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnHuyLoc.ForeColor = System.Drawing.Color.White;
-            this.btnHuyLoc.Location = new System.Drawing.Point(483, 236);
-            this.btnHuyLoc.Name = "btnHuyLoc";
-            this.btnHuyLoc.Size = new System.Drawing.Size(75, 30);
-            this.btnHuyLoc.TabIndex = 27;
-            this.btnHuyLoc.Text = "Hủy Lọc";
-            this.btnHuyLoc.UseVisualStyleBackColor = false;
             // 
             // UC_QuanLyNhanVien
             // 
