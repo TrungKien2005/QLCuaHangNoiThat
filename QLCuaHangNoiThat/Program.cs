@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QLCuaHangNoiThat.Forms;
+using System;
 using System.Windows.Forms;
 
 namespace QLCuaHangNoiThat

@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
-
+using QLCuaHangNoiThat.Properties;
 namespace QLCuaHangNoiThat.Forms
 {
     public partial class login : Form
@@ -93,7 +93,7 @@ Join taikhoan tk ON nv.MaNhanVien = tk.MaNhanVien
                             if (reader.Read())
                             {
                                 int macv = reader.GetInt32("MaChucVu");
-                                int[] allowedRoles = {1};
+                                int[] allowedRoles = { 1 };
 
                                 if (allowedRoles.Contains(macv))
                                 {
@@ -120,22 +120,22 @@ Join taikhoan tk ON nv.MaNhanVien = tk.MaNhanVien
             }
         }
 
-       
+
 
         private void hidepic_Click(object sender, EventArgs e)
         {
-            
-                showpic.BringToFront();
-                passuser.PasswordChar = '\0';
-            
+
+            showpic.BringToFront();
+            passuser.PasswordChar = '\0';
+
         }
 
         private void showpic_Click(object sender, EventArgs e)
         {
-            
-                hidepic.BringToFront();
-                passuser.PasswordChar = '*';
-            
+
+            hidepic.BringToFront();
+            passuser.PasswordChar = '*';
+
 
         }
     }
