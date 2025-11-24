@@ -5,7 +5,7 @@ using System.Windows.Forms;
 namespace QLCuaHangNoiThat
 {
     internal static class Program
-    {
+    {   
         [STAThread]
         static void Main()
         {

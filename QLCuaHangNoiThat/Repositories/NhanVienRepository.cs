@@ -1,9 +1,10 @@
 ﻿using MySql.Data.MySqlClient;
 using System.Collections.Generic;
-using QLCuaHangNoiThat.DataAccess; 
+using QLCuaHangNoiThat.DataAccess;
 using System;
 using System.Data;
 using QLCuaHangNoiThat.Models;
+
 namespace QLCuaHangNoiThat.Repositories
 {
     public class NhanVienRepository
@@ -43,18 +44,18 @@ namespace QLCuaHangNoiThat.Repositories
 
                             // Xử lý NgaySinh (Sử dụng IsDBNull)
                             NgaySinh = reader.IsDBNull(reader.GetOrdinal("NgaySinh"))
-                                       ? (DateTime?)null
-                                       : reader.GetDateTime("NgaySinh"),
+                                     ? (DateTime?)null
+                                     : reader.GetDateTime("NgaySinh"),
 
                             // Xử lý DiaChi (Sử dụng IsDBNull)
                             DiaChi = reader.IsDBNull(reader.GetOrdinal("DiaChi"))
-                                     ? null // Gán null cho string
-                                     : reader.GetString("DiaChi"),
+                                   ? null // Gán null cho string
+                                   : reader.GetString("DiaChi"),
 
                             // Xử lý NgayVaoLam (Sử dụng IsDBNull)
                             NgayVaoLam = reader.IsDBNull(reader.GetOrdinal("NgayVaoLam"))
-                                         ? (DateTime?)null
-                                         : reader.GetDateTime("NgayVaoLam"),
+                                             ? (DateTime?)null
+                                             : reader.GetDateTime("NgayVaoLam"),
 
                             TrangThai = reader.GetString("TrangThai"),
                             TenChucVu = reader.GetString("TenChucVu")
@@ -66,9 +67,9 @@ namespace QLCuaHangNoiThat.Repositories
         }
 
         // ------------------
-        // 2. THÊM DỮ LIỆU (CREATE) - Gộp cả thêm Tài khoản (Dùng Transaction)
+        // 2. THÊM DỮ LIỆU (CREATE) - ĐÃ CẬP NHẬT CHỮ KÝ HÀM VÀ KHẮC PHỤC LỖI GÁN CỨNG
         // ------------------
-        public int AddNhanVien(NhanVien nv, string tenDangNhap, string matKhau)
+        public int AddNhanVien(NhanVien nv, string tenDangNhap, string matKhau, string loaiTaiKhoan)
         {
             int maNV = -1;
 
@@ -80,8 +81,8 @@ namespace QLCuaHangNoiThat.Repositories
                 {
                     // Lệnh 1: Thêm Nhân viên và lấy ID mới
                     string queryNV = @"INSERT INTO NhanVien (MaChucVu, Ho, Ten, Email, SoDienThoai, NgaySinh, DiaChi, NgayVaoLam, TrangThai) 
-                                     VALUES (@MaChucVu, @Ho, @Ten, @Email, @SDT, @NS, @DC, @NVL, @TrangThai);
-                                     SELECT LAST_INSERT_ID();";
+                                       VALUES (@MaChucVu, @Ho, @Ten, @Email, @SDT, @NS, @DC, @NVL, @TrangThai);
+                                       SELECT LAST_INSERT_ID();";
 
                     MySqlCommand cmdNV = new MySqlCommand(queryNV, connection, transaction);
                     cmdNV.Parameters.AddWithValue("@MaChucVu", nv.MaChucVu);
@@ -107,13 +108,19 @@ namespace QLCuaHangNoiThat.Repositories
                         // Trường hợp ExecuteScalar trả về null (rất hiếm nếu câu lệnh đúng)
                         throw new InvalidOperationException("Không thể lấy ID nhân viên mới.");
                     }
+
+                    // Mã hóa mật khẩu (Giả sử SecurityHelper đã tồn tại)
                     string hashedPassword = SecurityHelper.HashSha256(matKhau);
+
                     // Lệnh 2: Thêm Tài khoản
                     string queryTK = "INSERT INTO TaiKhoan (TenDangNhap, MatKhau, LoaiTaiKhoan, MaNhanVien) VALUES (@TenDangNhap, @MatKhau, @LoaiTK, @MaNV)";
                     MySqlCommand cmdTK = new MySqlCommand(queryTK, connection, transaction);
                     cmdTK.Parameters.AddWithValue("@TenDangNhap", tenDangNhap);
                     cmdTK.Parameters.AddWithValue("@MatKhau", hashedPassword);
-                    cmdTK.Parameters.AddWithValue("@LoaiTK", "NhanVien");
+
+                    // >>> SỬA LỖI: SỬ DỤNG THAM SỐ loaiTaiKhoan ĐƯỢC TRUYỀN VÀO <<<
+                    cmdTK.Parameters.AddWithValue("@LoaiTK", loaiTaiKhoan);
+
                     cmdTK.Parameters.AddWithValue("@MaNV", maNV);
                     cmdTK.ExecuteNonQuery();
 
@@ -134,9 +141,9 @@ namespace QLCuaHangNoiThat.Repositories
         public void UpdateNhanVien(NhanVien nv)
         {
             string query = @"UPDATE NhanVien SET 
-                            MaChucVu=@MaChucVu, Ho=@Ho, Ten=@Ten, Email=@Email, SoDienThoai=@SDT, 
-                            NgaySinh=@NS, DiaChi=@DC, NgayVaoLam=@NVL, TrangThai=@TrangThai 
-                            WHERE MaNhanVien=@MaNV";
+                             MaChucVu=@MaChucVu, Ho=@Ho, Ten=@Ten, Email=@Email, SoDienThoai=@SDT, 
+                             NgaySinh=@NS, DiaChi=@DC, NgayVaoLam=@NVL, TrangThai=@TrangThai 
+                             WHERE MaNhanVien=@MaNV";
 
             MySqlParameter[] parameters = new MySqlParameter[]
             {
@@ -146,8 +153,8 @@ namespace QLCuaHangNoiThat.Repositories
                 new MySqlParameter("@Email", nv.Email),
                 new MySqlParameter("@SDT", nv.SoDienThoai),
                 new MySqlParameter("@NS", nv.NgaySinh.HasValue ? (object)nv.NgaySinh.Value : DBNull.Value),
-    new MySqlParameter("@DC", string.IsNullOrEmpty(nv.DiaChi) ? DBNull.Value : (object)nv.DiaChi),
-    new MySqlParameter("@NVL", nv.NgayVaoLam.HasValue ? (object)nv.NgayVaoLam.Value : DBNull.Value),
+                new MySqlParameter("@DC", string.IsNullOrEmpty(nv.DiaChi) ? DBNull.Value : (object)nv.DiaChi),
+                new MySqlParameter("@NVL", nv.NgayVaoLam.HasValue ? (object)nv.NgayVaoLam.Value : DBNull.Value),
                 new MySqlParameter("@TrangThai", nv.TrangThai),
                 new MySqlParameter("@MaNV", nv.MaNhanVien)
             };
@@ -204,7 +211,7 @@ namespace QLCuaHangNoiThat.Repositories
             WHERE (nv.Ho LIKE @Keyword OR nv.Ten LIKE @Keyword OR nv.Email LIKE @Keyword OR nv.SoDienThoai LIKE @Keyword)
             AND (@MaChucVu = 0 OR nv.MaChucVu = @MaChucVu)
             AND (@TrangThai = 'All' OR nv.TrangThai = @TrangThai)
-AND (@NgayVaoLam IS NULL OR DATE(nv.NgayVaoLam) >= DATE(@NgayVaoLam))";
+            AND (@NgayVaoLam IS NULL OR DATE(nv.NgayVaoLam) >= DATE(@NgayVaoLam))";
 
                 MySqlCommand cmd = new MySqlCommand(query, connection);
 
