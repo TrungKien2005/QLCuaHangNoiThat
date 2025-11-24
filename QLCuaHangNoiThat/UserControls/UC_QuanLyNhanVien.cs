@@ -325,9 +325,9 @@ namespace QLCuaHangNoiThat.UserControls
 
                         TrangThai = cbTrangThai.SelectedItem.ToString()
                     };
-
+                    string loaiTaiKhoanString = GetLoaiTaiKhoanString(newNV.MaChucVu);
                     // 2. Gọi Repository
-                    _nhanVienRepo.AddNhanVien(newNV, txtTenDangNhap.Text, txtMatKhau.Text);
+                    _nhanVienRepo.AddNhanVien(newNV, txtTenDangNhap.Text, txtMatKhau.Text, loaiTaiKhoanString);
 
                     // 3. THÀNH CÔNG
                     MessageBox.Show("✅ Thêm nhân viên thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -505,7 +505,21 @@ namespace QLCuaHangNoiThat.UserControls
             txtMatKhau.Clear();
             
         }
-
+        private string GetLoaiTaiKhoanString(int maChucVu)
+        {
+            switch (maChucVu)
+            {
+                // THAY THẾ CÁC SỐ NÀY BẰNG MÃ CSDL CỦA BẠN
+                case 1:
+                    return "Admin";
+                case 2:
+                    return "NhanVien";
+                case 3:
+                    return "QuanLy";
+                default:
+                    return "NhanVien";
+            }
+        }
         private void txtTimKiem_TextChanged(object sender, EventArgs e)
         {
             try
