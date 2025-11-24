@@ -20,7 +20,7 @@ namespace QLCuaHangNoiThat.UserControls
 
         private void UC_BaoCaoThongKe_Load(object sender, EventArgs e)
         {
-            dtpTuNgay.Value = DateTime.Now.AddMonths(-1);
+            dtpTuNgay.Value = new DateTime(2024, 1, 1); // hoặc ngày bắt đầu dữ liệu của bạn
             dtpDenNgay.Value = DateTime.Now;
 
             LoadDoanhThu();
@@ -37,7 +37,9 @@ namespace QLCuaHangNoiThat.UserControls
             DateTime denNgay = dtpDenNgay.Value.Date;
 
             DataTable dt = _repo.GetDoanhThu(tuNgay, denNgay);
+            MessageBox.Show("Số dòng: " + dt.Rows.Count);
             dgvDoanhThu.DataSource = dt;
+
 
             // Chart
             chartDoanhThu.Series.Clear();
@@ -46,8 +48,10 @@ namespace QLCuaHangNoiThat.UserControls
 
             foreach (DataRow row in dt.Rows)
             {
-                series.Points.AddXY(row["Ngay"].ToString(), Convert.ToDecimal(row["TongTien"]));
+                decimal tien = row["TongTien"] != DBNull.Value ? Convert.ToDecimal(row["TongTien"]) : 0;
+                series.Points.AddXY(row["Ngay"].ToString(), tien);
             }
+
         }
 
         private void LoadTopSP()

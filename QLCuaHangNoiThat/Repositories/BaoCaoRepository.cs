@@ -11,16 +11,16 @@ namespace QLCuaHangNoiThat.Repositories
         public DataTable GetDoanhThu(DateTime tuNgay, DateTime denNgay)
         {
             string query = @"
-                SELECT NgayDatHang AS Ngay, SUM(TongTien) AS TongTien
-                FROM donhang
-                WHERE NgayDatHang BETWEEN @TuNgay AND @DenNgay
-                GROUP BY NgayDatHang
-                ORDER BY NgayDatHang";
+        SELECT DATE(NgayDatHang) AS Ngay, SUM(TongTien) AS TongTien
+        FROM donhang
+        WHERE DATE(NgayDatHang) BETWEEN @TuNgay AND @DenNgay
+        GROUP BY DATE(NgayDatHang)
+        ORDER BY DATE(NgayDatHang)";
 
             return DatabaseHelper.ExecuteDataTable(query, new MySqlParameter[]
             {
-                new MySqlParameter("@TuNgay", tuNgay),
-                new MySqlParameter("@DenNgay", denNgay)
+        new MySqlParameter("@TuNgay", tuNgay),
+        new MySqlParameter("@DenNgay", denNgay)
             });
         }
 

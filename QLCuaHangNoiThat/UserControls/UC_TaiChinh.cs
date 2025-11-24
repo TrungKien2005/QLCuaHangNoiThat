@@ -44,16 +44,32 @@ namespace QLCuaHangNoiThat.UserControls
             try
             {
                 DataTable dtNhanVien = _repo.GetNhanVienList();
+
+                if (dtNhanVien == null || dtNhanVien.Rows.Count == 0)
+                {
+                    MessageBox.Show("Không có dữ liệu nhân viên!");
+                    return;
+                }
+
+                // Kiểm tra tồn tại cột
+                if (!dtNhanVien.Columns.Contains("Ten") || !dtNhanVien.Columns.Contains("MaNhanVien"))
+                {
+                    MessageBox.Show("❌ DataTable không đúng cấu trúc! Cần cột 'Ten' và 'MaNhanVien'");
+                    return;
+                }
+
                 cbNhanVien.DataSource = dtNhanVien;
-                cbNhanVien.DisplayMember = "Ten";      // Hiển thị tên nhân viên
-                cbNhanVien.ValueMember = "MaNhanVien"; // Lấy giá trị thực
-                cbNhanVien.SelectedIndex = -1;         // Không chọn mặc định
+                cbNhanVien.DisplayMember = "Ten";
+                cbNhanVien.ValueMember = "MaNhanVien";
+
+                cbNhanVien.SelectedIndex = -1;
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Lỗi khi tải danh sách nhân viên: {ex.Message}");
             }
         }
+
 
 
 

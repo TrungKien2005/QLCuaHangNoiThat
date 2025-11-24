@@ -158,9 +158,21 @@ namespace QLCuaHangNoiThat.Repositories
         // Lấy danh sách nhân viên để ComboBox
         public DataTable GetNhanVienList()
         {
-            string query = @"SELECT MaNhanVien, Ho, Ten FROM nhanvien WHERE TrangThai = 1"; // Chỉ lấy nhân viên đang hoạt động
+            string query = @"
+        SELECT 
+            MaNhanVien, 
+            CONCAT(Ho, ' ', Ten) AS Ten
+        FROM nhanvien
+        WHERE 
+            TrangThai = 'Active' 
+            OR TrangThai = 1 
+            OR TrangThai = '1'
+    ";
+
             return DatabaseHelper.ExecuteDataTable(query);
         }
+
+
 
     }
 }
