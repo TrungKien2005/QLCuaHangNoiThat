@@ -24,6 +24,13 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Panel panelKho;
+        private System.Windows.Forms.TextBox txtTenKho;
+        private System.Windows.Forms.TextBox txtDiaChiKho;
+        private System.Windows.Forms.Button btnThemKho;
+        private System.Windows.Forms.Button btnSuaKho;
+        private System.Windows.Forms.Button btnXoaKho;
+
 
         protected override void Dispose(bool disposing)
         {
@@ -107,6 +114,43 @@
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Danh sách kho";
             this.tabPage2.UseVisualStyleBackColor = true;
+
+            // panelKho
+            this.panelKho = new System.Windows.Forms.Panel();
+            this.panelKho.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panelKho.Size = new System.Drawing.Size(786, 80); // chiều cao panel
+            this.tabPage2.Controls.Add(this.panelKho);
+            // txtTenKho
+            this.txtTenKho = new System.Windows.Forms.TextBox();
+            this.txtTenKho.Location = new System.Drawing.Point(80, 20);
+            this.txtTenKho.Size = new System.Drawing.Size(150, 20);
+            this.panelKho.Controls.Add(this.txtTenKho);
+
+            // txtDiaChiKho
+            this.txtDiaChiKho = new System.Windows.Forms.TextBox();
+            this.txtDiaChiKho.Location = new System.Drawing.Point(80, 50);
+            this.txtDiaChiKho.Size = new System.Drawing.Size(150, 20);
+            this.panelKho.Controls.Add(this.txtDiaChiKho);
+            // btnThemKho
+this.btnThemKho = new System.Windows.Forms.Button();
+this.btnThemKho.Text = "Thêm";
+this.btnThemKho.Location = new System.Drawing.Point(250, 20);
+this.btnThemKho.Click += new System.EventHandler(this.btnThemKho_Click);
+this.panelKho.Controls.Add(this.btnThemKho);
+
+// btnSuaKho
+this.btnSuaKho = new System.Windows.Forms.Button();
+this.btnSuaKho.Text = "Sửa";
+this.btnSuaKho.Location = new System.Drawing.Point(330, 20);
+this.btnSuaKho.Click += new System.EventHandler(this.btnSuaKho_Click);
+this.panelKho.Controls.Add(this.btnSuaKho);
+
+// btnXoaKho
+this.btnXoaKho = new System.Windows.Forms.Button();
+this.btnXoaKho.Text = "Xóa";
+this.btnXoaKho.Location = new System.Drawing.Point(410, 20);
+this.btnXoaKho.Click += new System.EventHandler(this.btnXoaKho_Click);
+this.panelKho.Controls.Add(this.btnXoaKho);
 
             // dgvKho
             this.dgvKho.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;

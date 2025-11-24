@@ -4,51 +4,58 @@
     {
         private System.ComponentModel.IContainer components = null;
         private System.Windows.Forms.TabControl tabControl1;
-        private System.Windows.Forms.TabPage tabPage1;
-        private System.Windows.Forms.DataVisualization.Charting.Chart chartDoanhThu;
+        private System.Windows.Forms.TabPage tabPageDoanhThu;
+        private System.Windows.Forms.TabPage tabPageTopSP;
+        private System.Windows.Forms.TabPage tabPageTonKho;
+
         private System.Windows.Forms.DataGridView dgvDoanhThu;
-        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chartDoanhThu;
         private System.Windows.Forms.DataGridView dgvTopSP;
-        private System.Windows.Forms.TabPage tabPage3;
         private System.Windows.Forms.DataGridView dgvTonKho;
+
+        private System.Windows.Forms.DateTimePicker dtpTuNgay;
+        private System.Windows.Forms.DateTimePicker dtpDenNgay;
+        private System.Windows.Forms.Button btnLoc;
+        private System.Windows.Forms.Button btnXuatExcel;
+        private System.Windows.Forms.Button btnXuatPDF;
 
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
-            {
                 components.Dispose();
-            }
             base.Dispose(disposing);
         }
 
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.tabPageDoanhThu = new System.Windows.Forms.TabPage();
             this.chartDoanhThu = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.dgvDoanhThu = new System.Windows.Forms.DataGridView();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.dtpTuNgay = new System.Windows.Forms.DateTimePicker();
+            this.dtpDenNgay = new System.Windows.Forms.DateTimePicker();
+            this.btnLoc = new System.Windows.Forms.Button();
+            this.btnXuatExcel = new System.Windows.Forms.Button();
+            this.btnXuatPDF = new System.Windows.Forms.Button();
+            this.tabPageTopSP = new System.Windows.Forms.TabPage();
             this.dgvTopSP = new System.Windows.Forms.DataGridView();
-            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.tabPageTonKho = new System.Windows.Forms.TabPage();
             this.dgvTonKho = new System.Windows.Forms.DataGridView();
             this.tabControl1.SuspendLayout();
-            this.tabPage1.SuspendLayout();
+            this.tabPageDoanhThu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chartDoanhThu)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvDoanhThu)).BeginInit();
-            this.tabPage2.SuspendLayout();
+            this.tabPageTopSP.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvTopSP)).BeginInit();
-            this.tabPage3.SuspendLayout();
+            this.tabPageTonKho.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvTonKho)).BeginInit();
             this.SuspendLayout();
             // 
             // tabControl1
             // 
-            this.tabControl1.Controls.Add(this.tabPage1);
-            this.tabControl1.Controls.Add(this.tabPage2);
-            this.tabControl1.Controls.Add(this.tabPage3);
+            this.tabControl1.Controls.Add(this.tabPageDoanhThu);
+            this.tabControl1.Controls.Add(this.tabPageTopSP);
+            this.tabControl1.Controls.Add(this.tabPageTonKho);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Name = "tabControl1";
@@ -56,102 +63,131 @@
             this.tabControl1.Size = new System.Drawing.Size(800, 450);
             this.tabControl1.TabIndex = 0;
             // 
-            // tabPage1
+            // tabPageDoanhThu
             // 
-            this.tabPage1.Controls.Add(this.chartDoanhThu);
-            this.tabPage1.Controls.Add(this.dgvDoanhThu);
-            this.tabPage1.Location = new System.Drawing.Point(4, 22);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(792, 424);
-            this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "Doanh thu theo tháng";
-            this.tabPage1.UseVisualStyleBackColor = true;
+            this.tabPageDoanhThu.Controls.Add(this.chartDoanhThu);
+            this.tabPageDoanhThu.Controls.Add(this.dgvDoanhThu);
+            this.tabPageDoanhThu.Controls.Add(this.dtpTuNgay);
+            this.tabPageDoanhThu.Controls.Add(this.dtpDenNgay);
+            this.tabPageDoanhThu.Controls.Add(this.btnLoc);
+            this.tabPageDoanhThu.Controls.Add(this.btnXuatExcel);
+            this.tabPageDoanhThu.Controls.Add(this.btnXuatPDF);
+            this.tabPageDoanhThu.Location = new System.Drawing.Point(4, 25);
+            this.tabPageDoanhThu.Name = "tabPageDoanhThu";
+            this.tabPageDoanhThu.Size = new System.Drawing.Size(792, 421);
+            this.tabPageDoanhThu.TabIndex = 0;
+            this.tabPageDoanhThu.Text = "Doanh thu";
             // 
             // chartDoanhThu
             // 
-            chartArea1.Name = "ChartArea1";
-            this.chartDoanhThu.ChartAreas.Add(chartArea1);
             this.chartDoanhThu.Dock = System.Windows.Forms.DockStyle.Left;
-            legend1.Name = "Legend1";
-            this.chartDoanhThu.Legends.Add(legend1);
-            this.chartDoanhThu.Location = new System.Drawing.Point(3, 3);
+            this.chartDoanhThu.Location = new System.Drawing.Point(0, 0);
             this.chartDoanhThu.Name = "chartDoanhThu";
-            series1.ChartArea = "ChartArea1";
-            series1.Legend = "Legend1";
-            series1.Name = "Series1";
-            this.chartDoanhThu.Series.Add(series1);
-            this.chartDoanhThu.Size = new System.Drawing.Size(500, 418);
-            this.chartDoanhThu.TabIndex = 1;
-            this.chartDoanhThu.Text = "chart1";
+            this.chartDoanhThu.Size = new System.Drawing.Size(500, 421);
+            this.chartDoanhThu.TabIndex = 0;
             // 
             // dgvDoanhThu
             // 
             this.dgvDoanhThu.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this.dgvDoanhThu.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvDoanhThu.ColumnHeadersHeight = 29;
             this.dgvDoanhThu.Dock = System.Windows.Forms.DockStyle.Right;
-            this.dgvDoanhThu.Location = new System.Drawing.Point(509, 3);
+            this.dgvDoanhThu.Location = new System.Drawing.Point(512, 0);
             this.dgvDoanhThu.Name = "dgvDoanhThu";
-            this.dgvDoanhThu.Size = new System.Drawing.Size(280, 418);
-            this.dgvDoanhThu.TabIndex = 0;
+            this.dgvDoanhThu.RowHeadersWidth = 51;
+            this.dgvDoanhThu.Size = new System.Drawing.Size(280, 421);
+            this.dgvDoanhThu.TabIndex = 1;
             // 
-            // tabPage2
+            // dtpTuNgay
             // 
-            this.tabPage2.Controls.Add(this.dgvTopSP);
-            this.tabPage2.Location = new System.Drawing.Point(4, 22);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(792, 424);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "Top sản phẩm";
-            this.tabPage2.UseVisualStyleBackColor = true;
+            this.dtpTuNgay.Location = new System.Drawing.Point(10, 10);
+            this.dtpTuNgay.Name = "dtpTuNgay";
+            this.dtpTuNgay.Size = new System.Drawing.Size(200, 22);
+            this.dtpTuNgay.TabIndex = 2;
+            // 
+            // dtpDenNgay
+            // 
+            this.dtpDenNgay.Location = new System.Drawing.Point(180, 10);
+            this.dtpDenNgay.Name = "dtpDenNgay";
+            this.dtpDenNgay.Size = new System.Drawing.Size(200, 22);
+            this.dtpDenNgay.TabIndex = 3;
+            // 
+            // btnLoc
+            // 
+            this.btnLoc.Location = new System.Drawing.Point(350, 10);
+            this.btnLoc.Name = "btnLoc";
+            this.btnLoc.Size = new System.Drawing.Size(75, 23);
+            this.btnLoc.TabIndex = 4;
+            this.btnLoc.Text = "Lọc";
+            // 
+            // btnXuatExcel
+            // 
+            this.btnXuatExcel.Location = new System.Drawing.Point(420, 10);
+            this.btnXuatExcel.Name = "btnXuatExcel";
+            this.btnXuatExcel.Size = new System.Drawing.Size(75, 23);
+            this.btnXuatExcel.TabIndex = 5;
+            this.btnXuatExcel.Text = "Xuất Excel";
+            // 
+            // btnXuatPDF
+            // 
+            this.btnXuatPDF.Location = new System.Drawing.Point(520, 10);
+            this.btnXuatPDF.Name = "btnXuatPDF";
+            this.btnXuatPDF.Size = new System.Drawing.Size(75, 23);
+            this.btnXuatPDF.TabIndex = 6;
+            this.btnXuatPDF.Text = "Xuất PDF";
+            // 
+            //// tabPageTopSP
+            //// 
+            //this.tabPageTopSP.Controls.Add(this.dgvTopSP);
+            //this.tabPageTopSP.Location = new System.Drawing.Point(4, 25);
+            //this.tabPageTopSP.Name = "tabPageTopSP";
+            //this.tabPageTopSP.Size = new System.Drawing.Size(792, 421);
+            //this.tabPageTopSP.TabIndex = 1;
+            
             // 
             // dgvTopSP
+            //// 
+            //this.dgvTopSP.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            //this.dgvTopSP.ColumnHeadersHeight = 29;
+            //this.dgvTopSP.Dock = System.Windows.Forms.DockStyle.Fill;
+            //this.dgvTopSP.Location = new System.Drawing.Point(0, 0);
+            //this.dgvTopSP.Name = "dgvTopSP";
+            //this.dgvTopSP.RowHeadersWidth = 51;
+            //this.dgvTopSP.Size = new System.Drawing.Size(792, 421);
+            //this.dgvTopSP.TabIndex = 0;
             // 
-            this.dgvTopSP.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this.dgvTopSP.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvTopSP.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgvTopSP.Location = new System.Drawing.Point(3, 3);
-            this.dgvTopSP.Name = "dgvTopSP";
-            this.dgvTopSP.Size = new System.Drawing.Size(786, 418);
-            this.dgvTopSP.TabIndex = 0;
+            // tabPageTonKho
             // 
-            // tabPage3
-            // 
-            this.tabPage3.Controls.Add(this.dgvTonKho);
-            this.tabPage3.Location = new System.Drawing.Point(4, 22);
-            this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(792, 424);
-            this.tabPage3.TabIndex = 2;
-            this.tabPage3.Text = "Tồn kho";
-            this.tabPage3.UseVisualStyleBackColor = true;
+            this.tabPageTonKho.Controls.Add(this.dgvTonKho);
+            this.tabPageTonKho.Location = new System.Drawing.Point(4, 25);
+            this.tabPageTonKho.Name = "tabPageTonKho";
+            this.tabPageTonKho.Size = new System.Drawing.Size(792, 421);
+            this.tabPageTonKho.TabIndex = 2;
+            this.tabPageTonKho.Text = "Sản Phẩm Bán Chạy";
             // 
             // dgvTonKho
             // 
             this.dgvTonKho.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this.dgvTonKho.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvTonKho.ColumnHeadersHeight = 29;
             this.dgvTonKho.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgvTonKho.Location = new System.Drawing.Point(3, 3);
+            this.dgvTonKho.Location = new System.Drawing.Point(0, 0);
             this.dgvTonKho.Name = "dgvTonKho";
-            this.dgvTonKho.Size = new System.Drawing.Size(786, 418);
+            this.dgvTonKho.RowHeadersWidth = 51;
+            this.dgvTonKho.Size = new System.Drawing.Size(792, 421);
             this.dgvTonKho.TabIndex = 0;
             // 
             // UC_BaoCaoThongKe
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.tabControl1);
             this.Name = "UC_BaoCaoThongKe";
             this.Size = new System.Drawing.Size(800, 450);
             this.Load += new System.EventHandler(this.UC_BaoCaoThongKe_Load);
             this.tabControl1.ResumeLayout(false);
-            this.tabPage1.ResumeLayout(false);
+            this.tabPageDoanhThu.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.chartDoanhThu)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvDoanhThu)).EndInit();
-            this.tabPage2.ResumeLayout(false);
+            this.tabPageTopSP.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgvTopSP)).EndInit();
-            this.tabPage3.ResumeLayout(false);
+            this.tabPageTonKho.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgvTonKho)).EndInit();
             this.ResumeLayout(false);
 

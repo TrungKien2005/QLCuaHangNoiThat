@@ -174,7 +174,7 @@ namespace QLCuaHangNoiThat
 
         private void btnNhaCungCap_Click(object sender, EventArgs e)
         {
-            //ShowControl(typeof(UC_QuanLyNhaCungCap), (Button)sender);
+            ShowControl(typeof(UC_QuanLyNhaCungCap), (Button)sender);
             lblHeader.Text = "QUẢN LÝ NHÀ CUNG CẤP";
         }
 

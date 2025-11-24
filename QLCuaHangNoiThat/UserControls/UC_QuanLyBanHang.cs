@@ -240,7 +240,7 @@ namespace QLCuaHangNoiThat.UserControls
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 MessageBox.Show("Xóa thất bại", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }

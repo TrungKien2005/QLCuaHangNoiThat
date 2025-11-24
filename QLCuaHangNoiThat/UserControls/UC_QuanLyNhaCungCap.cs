@@ -1,278 +1,147 @@
 ﻿using System;
 using System.Data;
-using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
+using QLCuaHangNoiThat.Models;
+using QLCuaHangNoiThat.Services;
 
 namespace QLCuaHangNoiThat.UserControls
 {
     public partial class UC_QuanLyNhaCungCap : UserControl
     {
+        private DataTable dtNCC; // DataTable gốc để tìm kiếm
+        private readonly KhoService _khoService = new KhoService();
+
         public UC_QuanLyNhaCungCap()
         {
             InitializeComponent();
+            this.Load += UC_QuanLyNhaCungCap_Load;
         }
 
         private void UC_QuanLyNhaCungCap_Load(object sender, EventArgs e)
         {
-            LoadData();
-            SetupPlaceholder();
-            SetupEvents();
+            LoadDanhSachNCC();
+
+            // Đăng ký sự kiện
+            btnThemNCC.Click += BtnThemNCC_Click;
+            btnSuaNCC.Click += BtnSuaNCC_Click;
+            btnXoaNCC.Click += BtnXoaNCC_Click;
+            txtSearch.TextChanged += TxtSearch_TextChanged;
+            dgvNhaCungCap.SelectionChanged += DgvNhaCungCap_SelectionChanged;
         }
 
-        private void LoadData()
+        private void LoadDanhSachNCC()
+        {
+            dtNCC = _khoService.GetDanhSachNhaCungCap(); // giả lập DataTable
+            dgvNhaCungCap.DataSource = dtNCC;
+            dgvNhaCungCap.ClearSelection();
+            ClearInput();
+        }
+
+        private void BtnThemNCC_Click(object sender, EventArgs e)
         {
             try
             {
-                // Tạo dữ liệu mẫu
-                DataTable dt = new DataTable();
-                dt.Columns.Add("MaNhaCungCap", typeof(int));
-                dt.Columns.Add("TenNhaCungCap", typeof(string));
-                dt.Columns.Add("NguoiLienLac", typeof(string));
-                dt.Columns.Add("Email", typeof(string));
-                dt.Columns.Add("SoDienThoai", typeof(string));
-                dt.Columns.Add("DiaChi", typeof(string));
-
-                // Thêm dữ liệu mẫu
-                dt.Rows.Add(1, "Công ty Gỗ Đẹp", "Mr. Đẹp", "godep@email.com", "0912345678", "123 Nguyễn Trãi, Hà Nội");
-                dt.Rows.Add(2, "Xưởng Gỗ Việt", "Ms. Việt", "goviet@email.com", "0923456789", "456 Lê Lợi, TP.HCM");
-                dt.Rows.Add(3, "Nội Thất Cao Cấp", "Mr. Cao", "caocap@email.com", "0934567890", "789 Trần Hưng Đạo, Đà Nẵng");
-
-                dataGridViewNhaCungCap.DataSource = dt;
-
-                // Định dạng DataGridView
-                dataGridViewNhaCungCap.Columns["MaNhaCungCap"].HeaderText = "Mã NCC";
-                dataGridViewNhaCungCap.Columns["TenNhaCungCap"].HeaderText = "Tên nhà cung cấp";
-                dataGridViewNhaCungCap.Columns["NguoiLienLac"].HeaderText = "Người liên lạc";
-                dataGridViewNhaCungCap.Columns["Email"].HeaderText = "Email";
-                dataGridViewNhaCungCap.Columns["SoDienThoai"].HeaderText = "Số điện thoại";
-                dataGridViewNhaCungCap.Columns["DiaChi"].HeaderText = "Địa chỉ";
-
-                // Định dạng cột
-                dataGridViewNhaCungCap.Columns["MaNhaCungCap"].Width = 80;
-                dataGridViewNhaCungCap.Columns["SoDienThoai"].Width = 120;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Lỗi khi tải dữ liệu: {ex.Message}", "Lỗi",
-                              MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private void SetupPlaceholder()
-        {
-            // Thiết lập placeholder cho ô tìm kiếm
-            txtTimKiem.ForeColor = Color.Gray;
-            txtTimKiem.GotFocus += (s, e) =>
-            {
-                if (txtTimKiem.Text == "Tìm kiếm nhà cung cấp...")
+                var ncc = new NhaCungCap
                 {
-                    txtTimKiem.Text = "";
-                    txtTimKiem.ForeColor = Color.Black;
-                }
-            };
-
-            txtTimKiem.LostFocus += (s, e) =>
-            {
-                if (string.IsNullOrWhiteSpace(txtTimKiem.Text))
+                    TenNhaCungCap = txtTenNCC.Text,
+                    NguoiLienLac = txtNguoiLienLac.Text,
+                    Email = txtEmailNCC.Text,
+                    SoDienThoai = txtSDTNCC.Text,
+                    DiaChi = txtDiaChiNCC.Text
+                };
+                bool ok = _khoService.ThemNhaCungCap(ncc);
+                if (ok)
                 {
-                    txtTimKiem.Text = "Tìm kiếm nhà cung cấp...";
-                    txtTimKiem.ForeColor = Color.Gray;
-                }
-            };
-        }
-
-        private void SetupEvents()
-        {
-            // Sự kiện click cho các button
-            btnThem.Click += (s, e) => ThemNhaCungCap();
-            btnSua.Click += (s, e) => SuaNhaCungCap();
-            btnXoa.Click += (s, e) => XoaNhaCungCap();
-            btnRefresh.Click += (s, e) => RefreshData();
-            btnTimKiem.Click += (s, e) => TimKiemNhaCungCap();
-
-            // Sự kiện double click trên DataGridView
-            dataGridViewNhaCungCap.CellDoubleClick += (s, e) =>
-            {
-                if (e.RowIndex >= 0)
-                {
-                    HienThiThongTinNhaCungCap(e.RowIndex);
-                }
-            };
-
-            // Sự kiện Enter cho ô tìm kiếm
-            txtTimKiem.KeyPress += (s, e) =>
-            {
-                if (e.KeyChar == (char)Keys.Enter)
-                {
-                    TimKiemNhaCungCap();
-                    e.Handled = true;
-                }
-            };
-        }
-
-        private void ThemNhaCungCap()
-        {
-            try
-            {
-                if (!ValidateInputs()) return;
-
-                // Lấy thông tin từ form
-                string tenNCC = txtTenNhaCungCap.Text.Trim();
-                string nguoiLienLac = txtNguoiLienLac.Text.Trim();
-                string email = txtEmail.Text.Trim();
-                string soDienThoai = txtSoDienThoai.Text.Trim();
-                string diaChi = txtDiaChi.Text.Trim();
-
-                // TODO: Thêm code insert vào database ở đây
-                MessageBox.Show($"Đã thêm nhà cung cấp: {tenNCC}", "Thành công",
-                              MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                ClearForm();
-                LoadData();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Lỗi khi thêm nhà cung cấp: {ex.Message}", "Lỗi",
-                              MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private void SuaNhaCungCap()
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(txtMaNhaCungCap.Text) || txtMaNhaCungCap.Text == "Tự động tạo")
-                {
-                    MessageBox.Show("Vui lòng chọn nhà cung cấp cần sửa!", "Thông báo",
-                                  MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                if (!ValidateInputs()) return;
-
-                // TODO: Thêm code update vào database ở đây
-                MessageBox.Show($"Đã cập nhật nhà cung cấp: {txtTenNhaCungCap.Text}", "Thành công",
-                              MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                ClearForm();
-                LoadData();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Lỗi khi sửa nhà cung cấp: {ex.Message}", "Lỗi",
-                              MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private void XoaNhaCungCap()
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(txtMaNhaCungCap.Text) || txtMaNhaCungCap.Text == "Tự động tạo")
-                {
-                    MessageBox.Show("Vui lòng chọn nhà cung cấp cần xóa!", "Thông báo",
-                                  MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                var result = MessageBox.Show($"Bạn có chắc chắn muốn xóa nhà cung cấp {txtTenNhaCungCap.Text}?",
-                                           "Xác nhận xóa",
-                                           MessageBoxButtons.YesNo,
-                                           MessageBoxIcon.Question);
-
-                if (result == DialogResult.Yes)
-                {
-                    // TODO: Thêm code delete từ database ở đây
-                    MessageBox.Show($"Đã xóa nhà cung cấp: {txtTenNhaCungCap.Text}", "Thành công",
-                                  MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                    ClearForm();
-                    LoadData();
+                    MessageBox.Show("✅ Thêm nhà cung cấp thành công!");
+                    LoadDanhSachNCC();
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Lỗi khi xóa nhà cung cấp: {ex.Message}", "Lỗi",
-                              MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("❌ Lỗi: " + ex.Message);
             }
         }
 
-        private void TimKiemNhaCungCap()
+        private void BtnSuaNCC_Click(object sender, EventArgs e)
         {
-            string keyword = txtTimKiem.Text.Trim();
-            if (string.IsNullOrEmpty(keyword) || keyword == "Tìm kiếm nhà cung cấp...")
+            if (dgvNhaCungCap.CurrentRow == null) return;
+            int maNCC = Convert.ToInt32(dgvNhaCungCap.CurrentRow.Cells["MaNhaCungCap"].Value);
+
+            var ncc = new NhaCungCap
             {
-                LoadData();
+                MaNhaCungCap = maNCC,
+                TenNhaCungCap = txtTenNCC.Text,
+                NguoiLienLac = txtNguoiLienLac.Text,
+                Email = txtEmailNCC.Text,
+                SoDienThoai = txtSDTNCC.Text,
+                DiaChi = txtDiaChiNCC.Text
+            };
+            bool ok = _khoService.SuaNhaCungCap(ncc);
+            if (ok)
+            {
+                MessageBox.Show("✅ Cập nhật nhà cung cấp thành công!");
+                LoadDanhSachNCC();
+            }
+        }
+
+        private void BtnXoaNCC_Click(object sender, EventArgs e)
+        {
+            if (dgvNhaCungCap.CurrentRow == null) return;
+            int maNCC = Convert.ToInt32(dgvNhaCungCap.CurrentRow.Cells["MaNhaCungCap"].Value);
+
+            var confirm = MessageBox.Show("Bạn có chắc muốn xóa nhà cung cấp này?", "Xác nhận", MessageBoxButtons.YesNo);
+            if (confirm != DialogResult.Yes) return;
+
+            bool ok = _khoService.XoaNhaCungCap(maNCC);
+            if (ok)
+            {
+                MessageBox.Show("✅ Xóa nhà cung cấp thành công!");
+                LoadDanhSachNCC();
+            }
+        }
+
+        private void TxtSearch_TextChanged(object sender, EventArgs e)
+        {
+            string keyword = txtSearch.Text.Trim().ToLower();
+            if (string.IsNullOrEmpty(keyword))
+            {
+                dgvNhaCungCap.DataSource = dtNCC;
                 return;
             }
 
-            // TODO: Thêm code tìm kiếm thực tế
-            MessageBox.Show($"Tìm kiếm: {keyword}", "Thông báo",
-                          MessageBoxButtons.OK, MessageBoxIcon.Information);
+            var filtered = dtNCC.AsEnumerable()
+                .Where(r =>
+                    r["TenNhaCungCap"].ToString().ToLower().Contains(keyword) ||
+                    r["NguoiLienLac"].ToString().ToLower().Contains(keyword) ||
+                    r["Email"].ToString().ToLower().Contains(keyword) ||
+                    r["SoDienThoai"].ToString().ToLower().Contains(keyword)
+                );
+
+            if (filtered.Any())
+                dgvNhaCungCap.DataSource = filtered.CopyToDataTable();
+            else
+                dgvNhaCungCap.DataSource = null;
         }
 
-        private void RefreshData()
+        private void DgvNhaCungCap_SelectionChanged(object sender, EventArgs e)
         {
-            ClearForm();
-            LoadData();
+            if (dgvNhaCungCap.CurrentRow == null) return;
+
+            txtTenNCC.Text = dgvNhaCungCap.CurrentRow.Cells["TenNhaCungCap"].Value.ToString();
+            txtNguoiLienLac.Text = dgvNhaCungCap.CurrentRow.Cells["NguoiLienLac"].Value.ToString();
+            txtEmailNCC.Text = dgvNhaCungCap.CurrentRow.Cells["Email"].Value.ToString();
+            txtSDTNCC.Text = dgvNhaCungCap.CurrentRow.Cells["SoDienThoai"].Value.ToString();
+            txtDiaChiNCC.Text = dgvNhaCungCap.CurrentRow.Cells["DiaChi"].Value.ToString();
         }
 
-        private void HienThiThongTinNhaCungCap(int rowIndex)
+        private void ClearInput()
         {
-            try
-            {
-                DataGridViewRow row = dataGridViewNhaCungCap.Rows[rowIndex];
-                txtMaNhaCungCap.Text = row.Cells["MaNhaCungCap"].Value?.ToString() ?? "";
-                txtTenNhaCungCap.Text = row.Cells["TenNhaCungCap"].Value?.ToString() ?? "";
-                txtNguoiLienLac.Text = row.Cells["NguoiLienLac"].Value?.ToString() ?? "";
-                txtEmail.Text = row.Cells["Email"].Value?.ToString() ?? "";
-                txtSoDienThoai.Text = row.Cells["SoDienThoai"].Value?.ToString() ?? "";
-                txtDiaChi.Text = row.Cells["DiaChi"].Value?.ToString() ?? "";
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Lỗi khi hiển thị thông tin: {ex.Message}", "Lỗi",
-                              MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private bool ValidateInputs()
-        {
-            if (string.IsNullOrEmpty(txtTenNhaCungCap.Text))
-            {
-                MessageBox.Show("Vui lòng nhập tên nhà cung cấp!", "Lỗi",
-                              MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                txtTenNhaCungCap.Focus();
-                return false;
-            }
-
-            if (string.IsNullOrEmpty(txtNguoiLienLac.Text))
-            {
-                MessageBox.Show("Vui lòng nhập người liên lạc!", "Lỗi",
-                              MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                txtNguoiLienLac.Focus();
-                return false;
-            }
-
-            if (string.IsNullOrEmpty(txtSoDienThoai.Text))
-            {
-                MessageBox.Show("Vui lòng nhập số điện thoại!", "Lỗi",
-                              MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                txtSoDienThoai.Focus();
-                return false;
-            }
-
-            return true;
-        }
-
-        private void ClearForm()
-        {
-            txtMaNhaCungCap.Text = "Tự động tạo";
-            txtTenNhaCungCap.Clear();
+            txtTenNCC.Clear();
             txtNguoiLienLac.Clear();
-            txtEmail.Clear();
-            txtSoDienThoai.Clear();
-            txtDiaChi.Clear();
+            txtEmailNCC.Clear();
+            txtSDTNCC.Clear();
+            txtDiaChiNCC.Clear();
         }
     }
 }

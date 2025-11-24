@@ -2,8 +2,6 @@
 using System.Data;
 using System.Windows.Forms;
 using QLCuaHangNoiThat.Repositories;
-using MySql.Data.MySqlClient;
-using QLCuaHangNoiThat.DataAccess;
 
 namespace QLCuaHangNoiThat.UserControls
 {
@@ -22,10 +20,10 @@ namespace QLCuaHangNoiThat.UserControls
             LoadNhanVienComboBox();
             UpdateFinancialSummary();
 
-            // Thiết lập ngày mặc định
             dtpTuNgay.Value = DateTime.Now.AddDays(-30);
             dtpDenNgay.Value = DateTime.Now;
             dtpNgayGD.Value = DateTime.Now;
+            cbLoaiGD.SelectedIndex = 0;
         }
 
         private void LoadData()
@@ -46,30 +44,18 @@ namespace QLCuaHangNoiThat.UserControls
             try
             {
                 DataTable dtNhanVien = _repo.GetNhanVienList();
-                cbNhanVien.Items.Clear();
-
-                if (dtNhanVien.Rows.Count > 0)
-                {
-                    foreach (DataRow row in dtNhanVien.Rows)
-                    {
-                        cbNhanVien.Items.Add($"{row["MaNV"]} - {row["TenNV"]}");
-                    }
-                }
-                else
-                {
-                    // Thêm dữ liệu mẫu nếu chưa có
-                    cbNhanVien.Items.AddRange(new string[] {
-                        "NV001 - Nguyễn Văn A",
-                        "NV002 - Trần Thị B",
-                        "NV003 - Lê Văn C"
-                    });
-                }
+                cbNhanVien.DataSource = dtNhanVien;
+                cbNhanVien.DisplayMember = "Ten";      // Hiển thị tên nhân viên
+                cbNhanVien.ValueMember = "MaNhanVien"; // Lấy giá trị thực
+                cbNhanVien.SelectedIndex = -1;         // Không chọn mặc định
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Lỗi khi tải danh sách nhân viên: {ex.Message}");
             }
         }
+
+
 
         private void btnThem_Click(object sender, EventArgs e)
         {
@@ -81,9 +67,17 @@ namespace QLCuaHangNoiThat.UserControls
                 decimal soTien = numSoTien.Value;
                 string noiDung = txtNoiDung.Text.Trim();
                 DateTime ngayGD = dtpNgayGD.Value;
-                string nhanVien = cbNhanVien.SelectedItem?.ToString();
 
-                if (_repo.ThemGiaoDich(loaiGD, soTien, noiDung, ngayGD, nhanVien))
+                // Lấy mã nhân viên từ ComboBox
+                string maNhanVien = cbNhanVien.SelectedValue?.ToString();
+                if (string.IsNullOrEmpty(maNhanVien))
+                {
+                    MessageBox.Show("❌ Vui lòng chọn nhân viên!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // Thêm giao dịch
+                if (_repo.ThemGiaoDich(loaiGD, soTien, noiDung, ngayGD, maNhanVien))
                 {
                     MessageBox.Show("✅ Thêm giao dịch thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     LoadData();
@@ -101,13 +95,14 @@ namespace QLCuaHangNoiThat.UserControls
             }
         }
 
+
+
         private void btnLoc_Click(object sender, EventArgs e)
         {
             try
             {
-                DateTime tuNgay = dtpTuNgay.Value;
-                DateTime denNgay = dtpDenNgay.Value;
-                string loaiGD = cbLoaiGD.SelectedItem?.ToString() ?? "Tất cả";
+                DateTime tuNgay = dtpTuNgay.Value.Date;
+                DateTime denNgay = dtpDenNgay.Value.Date;
 
                 if (tuNgay > denNgay)
                 {
@@ -115,18 +110,19 @@ namespace QLCuaHangNoiThat.UserControls
                     return;
                 }
 
+                string loaiGD = cbLoaiGD.SelectedItem?.ToString() ?? "Tất cả";
+
                 DataTable filteredData = _repo.LocGiaoDich(tuNgay, denNgay, loaiGD);
                 dgvTaiChinh.DataSource = filteredData;
 
                 UpdateFinancialSummary(tuNgay, denNgay);
-
-                MessageBox.Show($"✅ Đã lọc {filteredData.Rows.Count} giao dịch!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"❌ Lỗi khi lọc dữ liệu: {ex.Message}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
 
         private void UpdateFinancialSummary(DateTime? tuNgay = null, DateTime? denNgay = null)
         {
@@ -140,7 +136,6 @@ namespace QLCuaHangNoiThat.UserControls
                 lblTongChi.Text = $"{tongChi:N0} đ";
                 lblConLai.Text = $"{conLai:N0} đ";
 
-                // Đổi màu
                 lblTongThu.ForeColor = System.Drawing.Color.Green;
                 lblTongChi.ForeColor = System.Drawing.Color.Red;
                 lblConLai.ForeColor = conLai >= 0 ? System.Drawing.Color.Green : System.Drawing.Color.Red;
@@ -176,16 +171,15 @@ namespace QLCuaHangNoiThat.UserControls
                 return false;
             }
 
+            if (cbNhanVien.SelectedIndex == -1)
+            {
+                MessageBox.Show("❌ Vui lòng chọn nhân viên!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                cbNhanVien.Focus();
+                return false;
+            }
+
             return true;
         }
 
-        private void btnResetFilter_Click(object sender, EventArgs e)
-        {
-            dtpTuNgay.Value = DateTime.Now.AddDays(-30);
-            dtpDenNgay.Value = DateTime.Now;
-            cbLoaiGD.SelectedIndex = 0;
-            LoadData();
-            UpdateFinancialSummary();
-        }
     }
 }

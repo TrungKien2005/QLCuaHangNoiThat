@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Data;
-using System.Windows.Forms;
 using MySql.Data.MySqlClient;
 using QLCuaHangNoiThat.DataAccess;
 
@@ -8,6 +7,7 @@ namespace QLCuaHangNoiThat.Repositories
 {
     public class TaiChinhRepository
     {
+        // Lấy tất cả giao dịch
         public DataTable GetAllGiaoDich()
         {
             DataTable dt = new DataTable();
@@ -16,50 +16,50 @@ namespace QLCuaHangNoiThat.Repositories
                 try
                 {
                     conn.Open();
-                    string query = @"SELECT 
-                                    MaGD, LoaiGD, SoTien, NoiDung, NgayGD, NhanVien, CreatedAt
-                                    FROM GiaoDich 
-                                    ORDER BY NgayGD DESC, MaGD DESC";
+                    string query = @"
+                        SELECT tc.MaGiaoDich, tc.LoaiGiaoDich, tc.SoTien, tc.NoiDung, tc.NgayGiaoDich,
+                               nv.MaNhanVien, CONCAT(nv.Ho, ' ', nv.Ten) AS TenNhanVien
+                        FROM taichinh tc
+                        LEFT JOIN nhanvien nv ON tc.MaNhanVien = nv.MaNhanVien
+                        ORDER BY tc.NgayGiaoDich DESC";
 
-                    MySqlCommand cmd = new MySqlCommand(query, conn);
-                    MySqlDataAdapter da = new MySqlDataAdapter(cmd);
+                    MySqlDataAdapter da = new MySqlDataAdapter(query, conn);
                     da.Fill(dt);
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception($"Lỗi khi lấy dữ liệu giao dịch: {ex.Message}");
+                    throw new Exception($"Lỗi khi lấy dữ liệu tài chính: {ex.Message}");
                 }
             }
             return dt;
         }
 
-        public bool ThemGiaoDich(string loaiGD, decimal soTien, string noiDung, DateTime ngayGD, string nhanVien)
+        // Thêm giao dịch mới
+        public bool ThemGiaoDich(string loaiGD, decimal soTien, string noiDung, DateTime ngayGD, string maNhanVien)
         {
-            using (MySqlConnection conn = DatabaseHelper.GetConnection())
+            try
             {
-                try
-                {
-                    conn.Open();
-                    string query = @"INSERT INTO GiaoDich (LoaiGD, SoTien, NoiDung, NgayGD, NhanVien)
-                                   VALUES (@LoaiGD, @SoTien, @NoiDung, @NgayGD, @NhanVien)";
+                string query = @"INSERT INTO taichinh (LoaiGiaoDich, SoTien, NoiDung, NgayGiaoDich, MaNhanVien)
+                         VALUES (@LoaiGD, @SoTien, @NoiDung, @NgayGD, @MaNV)";
 
-                    MySqlCommand cmd = new MySqlCommand(query, conn);
-                    cmd.Parameters.AddWithValue("@LoaiGD", loaiGD);
-                    cmd.Parameters.AddWithValue("@SoTien", soTien);
-                    cmd.Parameters.AddWithValue("@NoiDung", noiDung);
-                    cmd.Parameters.AddWithValue("@NgayGD", ngayGD);
-                    cmd.Parameters.AddWithValue("@NhanVien", nhanVien ?? (object)DBNull.Value);
-
-                    int result = cmd.ExecuteNonQuery();
-                    return result > 0;
-                }
-                catch (Exception ex)
+                MySqlParameter[] parameters = new MySqlParameter[]
                 {
-                    throw new Exception($"Lỗi khi thêm giao dịch: {ex.Message}");
-                }
+            new MySqlParameter("@LoaiGD", loaiGD),
+            new MySqlParameter("@SoTien", soTien),
+            new MySqlParameter("@NoiDung", noiDung),
+            new MySqlParameter("@NgayGD", ngayGD),
+            new MySqlParameter("@MaNV", maNhanVien)
+                };
+
+                return DatabaseHelper.ExecuteNonQuery(query, parameters) > 0;
+            }
+            catch
+            {
+                throw;
             }
         }
 
+        // Lọc giao dịch theo ngày và loại
         public DataTable LocGiaoDich(DateTime tuNgay, DateTime denNgay, string loaiGD)
         {
             DataTable dt = new DataTable();
@@ -68,95 +68,99 @@ namespace QLCuaHangNoiThat.Repositories
                 try
                 {
                     conn.Open();
-                    string query = @"SELECT * FROM GiaoDich 
-                                   WHERE NgayGD BETWEEN @TuNgay AND @DenNgay";
+                    string query = @"
+                        SELECT tc.MaGiaoDich, tc.LoaiGiaoDich, tc.SoTien, tc.NoiDung, tc.NgayGiaoDich,
+                               nv.MaNhanVien, CONCAT(nv.Ho, ' ', nv.Ten) AS TenNhanVien
+                        FROM taichinh tc
+                        LEFT JOIN nhanvien nv ON tc.MaNhanVien = nv.MaNhanVien
+                        WHERE tc.NgayGiaoDich BETWEEN @TuNgay AND @DenNgay";
 
                     if (loaiGD != "Tất cả")
-                        query += " AND LoaiGD = @LoaiGD";
+                        query += " AND tc.LoaiGiaoDich = @LoaiGiaoDich";
 
-                    query += " ORDER BY NgayGD DESC, MaGD DESC";
+                    query += " ORDER BY tc.NgayGiaoDich DESC";
 
                     MySqlCommand cmd = new MySqlCommand(query, conn);
-                    cmd.Parameters.AddWithValue("@TuNgay", tuNgay.Date);
-                    cmd.Parameters.AddWithValue("@DenNgay", denNgay.Date.AddDays(1).AddSeconds(-1));
-
+                    cmd.Parameters.AddWithValue("@TuNgay", tuNgay);
+                    cmd.Parameters.AddWithValue("@DenNgay", denNgay);
                     if (loaiGD != "Tất cả")
-                        cmd.Parameters.AddWithValue("@LoaiGD", loaiGD);
+                        cmd.Parameters.AddWithValue("@LoaiGiaoDich", loaiGD);
 
                     MySqlDataAdapter da = new MySqlDataAdapter(cmd);
                     da.Fill(dt);
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception($"Lỗi khi lọc giao dịch: {ex.Message}");
+                    throw new Exception($"Lỗi khi lọc dữ liệu tài chính: {ex.Message}");
                 }
             }
             return dt;
         }
 
+        // Tính tổng thu
         public decimal TongThu(DateTime? tuNgay = null, DateTime? denNgay = null)
-        {
-            return TongTheoLoai("Thu", tuNgay, denNgay);
-        }
-
-        public decimal TongChi(DateTime? tuNgay = null, DateTime? denNgay = null)
-        {
-            return TongTheoLoai("Chi", tuNgay, denNgay);
-        }
-
-        private decimal TongTheoLoai(string loaiGD, DateTime? tuNgay = null, DateTime? denNgay = null)
         {
             using (MySqlConnection conn = DatabaseHelper.GetConnection())
             {
                 try
                 {
                     conn.Open();
-                    string query = "SELECT COALESCE(SUM(SoTien), 0) FROM GiaoDich WHERE LoaiGD = @LoaiGD";
-
+                    string query = "SELECT SUM(SoTien) FROM taichinh WHERE LoaiGiaoDich = 'Thu'";
                     if (tuNgay.HasValue && denNgay.HasValue)
-                    {
-                        query += " AND NgayGD BETWEEN @TuNgay AND @DenNgay";
-                    }
+                        query += " AND NgayGiaoDich BETWEEN @TuNgay AND @DenNgay";
 
                     MySqlCommand cmd = new MySqlCommand(query, conn);
-                    cmd.Parameters.AddWithValue("@LoaiGD", loaiGD);
-
                     if (tuNgay.HasValue && denNgay.HasValue)
                     {
-                        cmd.Parameters.AddWithValue("@TuNgay", tuNgay.Value.Date);
-                        cmd.Parameters.AddWithValue("@DenNgay", denNgay.Value.Date.AddDays(1).AddSeconds(-1));
+                        cmd.Parameters.AddWithValue("@TuNgay", tuNgay.Value);
+                        cmd.Parameters.AddWithValue("@DenNgay", denNgay.Value);
                     }
 
                     object result = cmd.ExecuteScalar();
-                    return result == DBNull.Value ? 0 : Convert.ToDecimal(result);
+                    return result != DBNull.Value ? Convert.ToDecimal(result) : 0;
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception($"Lỗi khi tính tổng {loaiGD}: {ex.Message}");
+                    throw new Exception($"Lỗi khi tính tổng thu: {ex.Message}");
                 }
             }
         }
 
-        public DataTable GetNhanVienList()
+        // Tính tổng chi
+        public decimal TongChi(DateTime? tuNgay = null, DateTime? denNgay = null)
         {
-            DataTable dt = new DataTable();
             using (MySqlConnection conn = DatabaseHelper.GetConnection())
             {
                 try
                 {
                     conn.Open();
-                    string query = "SELECT MaNV, TenNV FROM NhanVien ORDER BY TenNV";
+                    string query = "SELECT SUM(SoTien) FROM taichinh WHERE LoaiGiaoDich = 'Chi'";
+                    if (tuNgay.HasValue && denNgay.HasValue)
+                        query += " AND NgayGiaoDich BETWEEN @TuNgay AND @DenNgay";
+
                     MySqlCommand cmd = new MySqlCommand(query, conn);
-                    MySqlDataAdapter da = new MySqlDataAdapter(cmd);
-                    da.Fill(dt);
+                    if (tuNgay.HasValue && denNgay.HasValue)
+                    {
+                        cmd.Parameters.AddWithValue("@TuNgay", tuNgay.Value);
+                        cmd.Parameters.AddWithValue("@DenNgay", denNgay.Value);
+                    }
+
+                    object result = cmd.ExecuteScalar();
+                    return result != DBNull.Value ? Convert.ToDecimal(result) : 0;
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Lỗi: {ex.Message}");
-                    // Hoặc: Console.WriteLine(ex.Message);
+                    throw new Exception($"Lỗi khi tính tổng chi: {ex.Message}");
                 }
             }
-            return dt;
         }
+
+        // Lấy danh sách nhân viên để ComboBox
+        public DataTable GetNhanVienList()
+        {
+            string query = @"SELECT MaNhanVien, Ho, Ten FROM nhanvien WHERE TrangThai = 1"; // Chỉ lấy nhân viên đang hoạt động
+            return DatabaseHelper.ExecuteDataTable(query);
+        }
+
     }
 }
