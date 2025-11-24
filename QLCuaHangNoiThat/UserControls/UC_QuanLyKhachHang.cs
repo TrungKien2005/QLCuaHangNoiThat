@@ -319,27 +319,45 @@ namespace QLCuaHangNoiThat.UserControls
             }
         }
 
-        
-        // HÀM DELETE (Xóa Khách hàng)
-        
-        private void btnXoa_Click(object sender, EventArgs e)
+
+        // HÀM DELETE (Xóa Khách hàng)
+
+        private void btnXoa_Click(object sender, EventArgs e)
         {
             if (dgvKhachHang.CurrentRow == null) return;
 
+            // Bước 1: Xác nhận xóa ban đầu
             if (MessageBox.Show("Bạn có chắc muốn xóa khách hàng này?", "Xác nhận", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
                 try
                 {
                     int maKH = Convert.ToInt32(dgvKhachHang.CurrentRow.Cells["MaKhachHang"].Value);
+                    // BƯỚC QUAN TRỌNG: KIỂM TRA ĐƠN HÀNG TRƯỚC KHI GỌI LỆNH XÓA CỨNG
+                    bool coDonHang = _khachHangRepo.KiemTraTonTaiDonHang(maKH);
 
-                    _khachHangRepo.DeleteKhachHang(maKH); // Gọi Repository
+                    if (coDonHang)
+                    {
+                        // KHÓA XÓA CỨNG VÀ HIỂN THỊ CẢNH BÁO
+                        MessageBox.Show(
+                            "Không thể xóa khách hàng này vì họ đã có lịch sử đơn hàng phát sinh trong hệ thống.",
+                            "Không Thể Xóa",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Warning // Biểu tượng cảnh báo
+                        );
+                    }
+                    else
+                    {
+                        // THỰC HIỆN XÓA CỨNG (chỉ khi không có đơn hàng)
+                        _khachHangRepo.DeleteKhachHang(maKH);
 
-                    MessageBox.Show("Xóa khách hàng thành công!");
-                    LoadKhachHang();
-                    ClearFields();
+                        MessageBox.Show("Xóa khách hàng thành công!");
+                        LoadKhachHang();
+                        ClearFields();
+                    }
                 }
                 catch (Exception ex)
                 {
+                    // Xử lý lỗi CSDL (ví dụ: mất kết nối, lỗi trong câu lệnh SQL)
                     MessageBox.Show("Lỗi xóa khách hàng: " + ex.Message);
                 }
             }

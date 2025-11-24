@@ -304,5 +304,32 @@ namespace QLCuaHangNoiThat.Repositories
 
             return listLichSu;
         }
+        public bool KiemTraTonTaiDonHang(int maKhachHang)
+        {
+            // Câu lệnh SQL đếm số lượng đơn hàng có MaKhachHang này
+            string query = "SELECT COUNT(*) FROM donhang WHERE MaKhachHang = @MaKH";
+
+            using (MySqlConnection connection = DatabaseHelper.GetConnection())
+            {
+                MySqlCommand cmd = new MySqlCommand(query, connection);
+                // Tham số an toàn
+                cmd.Parameters.AddWithValue("@MaKH", maKhachHang);
+
+                try
+                {
+                    connection.Open();
+                    // ExecuteScalar trả về giá trị đầu tiên của hàng đầu tiên (chính là COUNT)
+                    // Ép kiểu về long rồi Convert.ToInt32 để an toàn
+                    long count = (long)cmd.ExecuteScalar();
+
+                    return count > 0; // Trả về TRUE nếu số lượng > 0 (tức là có đơn hàng)
+                }
+                catch (Exception ex)
+                {
+                    // Ném lỗi lên lớp trên (WinForms) để hiển thị thông báo
+                    throw new Exception("Lỗi CSDL khi kiểm tra đơn hàng của khách hàng.", ex);
+                }
+            }
+        }
     }
 }
