@@ -141,12 +141,12 @@
     <Compile Include="Forms\capnhatttdh.Designer.cs">
       <DependentUpon>capnhatttdh.cs</DependentUpon>
     </Compile>
-<!-- HEAD -->
+    <!-- HEAD -->
     <Compile Include="Forms\FormQuanLyDanhMuc.cs">
-       <SubType>Form</SubType>
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\FormQuanLyDanhMuc.Designer.cs">
-       <DependentUpon>FormQuanLyDanhMuc.cs</DependentUpon>
+      <DependentUpon>FormQuanLyDanhMuc.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\FormThemSuaSanPham.cs">
       <SubType>Form</SubType>
@@ -154,7 +154,6 @@
     <Compile Include="Forms\FormThemSuaSanPham.Designer.cs">
       <DependentUpon>FormThemSuaSanPham.cs</DependentUpon>
     </Compile>
-
     <Compile Include="Forms\FormLichSuMuaHang.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -186,7 +185,7 @@
     <Compile Include="Forms\login.Designer.cs">
       <DependentUpon>login.cs</DependentUpon>
     </Compile>
-<!-- HEAD -->
+    <!-- HEAD -->
     <Compile Include="Models\ComboboxItem.cs" />
     <Compile Include="Models\DanhMuc.cs" />
     <Compile Include="Models\KhachHang.cs" />
@@ -208,10 +207,9 @@
     </Compile>
     <Compile Include="Models\SanPham.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-<!-- HEAD -->
+    <!-- HEAD -->
     <Compile Include="Repositories\BaoCaoRepository.cs" />
     <Compile Include="Repositories\DanhMucRepository.cs" />
-    <Compile Include="Repositories\BaoCaoThongKe.cs" />
     <Compile Include="Repositories\KhachHangRepository.cs" />
     <Compile Include="Repositories\KhoRepository.cs" />
     <Compile Include="Repositories\NhanVienRepository.cs" />
@@ -311,11 +309,8 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <SubType>Designer</SubType>
       <Generator>ResXFileCodeGenerator</Generator>
-      <Compile Include="Properties\Resources1.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-      </Compile>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
