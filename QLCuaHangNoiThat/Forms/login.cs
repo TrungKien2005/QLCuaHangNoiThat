@@ -99,7 +99,7 @@ Join taikhoan tk ON nv.MaNhanVien = tk.MaNhanVien
                                 {
                                     FormMain main = new FormMain();
                                     main.Show();
-                                    this.Close();
+                                    this.Hide();
                                 }
                                 else
                                 {
