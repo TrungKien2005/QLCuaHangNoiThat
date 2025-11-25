@@ -15,7 +15,7 @@ namespace QLCuaHangNoiThat.UserControls
     public partial class UC_QuanLySanPham : UserControl
     {
         private readonly SanPhamRepository _repo = new SanPhamRepository();
-        //private readonly DanhMucRepository _danhMucRepo = new DanhMucRepository();
+        private readonly DanhMucRepository _danhMucRepo = new DanhMucRepository();
         private DataGridViewImageColumn dgvImageColumn;
         private DataGridViewCheckBoxColumn dgvTrangThaiColumn;
         private Label lblKetQuaTimKiem;
@@ -88,12 +88,20 @@ namespace QLCuaHangNoiThat.UserControls
         private bool _isDataLoaded = false;
         private void UC_QuanLySanPham_Load(object sender, EventArgs e)
         {
+            SetupFilterControls();
+
+            // Gán event cho ComboBox để lọc
+            cboDanhMucFilter.SelectedIndexChanged += (s, ev) => ApplyFilters();
+            cboTinhTrangFilter.SelectedIndexChanged += (s, ev) => ApplyFilters();
+            cboGiaFilter.SelectedIndexChanged += (s, ev) => ApplyFilters();
+
             if (!_isDataLoaded)
             {
                 LoadData();
                 _isDataLoaded = true;
             }
         }
+
         private void UC_QuanLySanPham_VisibleChanged(object sender, EventArgs e)
         {
             if (this.Visible && !_isDataLoaded)
@@ -152,36 +160,54 @@ namespace QLCuaHangNoiThat.UserControls
             Console.WriteLine($"Đã đăng ký sự kiện TextChanged cho txtTimKiem");
         }
         // Replace all occurrences of 'cmbDanhMuc' with 'cboDanhMucFilter' in SetupFilterControls
-        //private void SetupFilterControls()
-        //{
-        //    if (cboDanhMucFilter != null && !DesignMode)
-        //    {
-        //        try
-        //        {
-        //            var danhMucList = _danhMucRepo.GetAll();
-        //            cboDanhMucFilter.Items.Clear();
-        //            cboDanhMucFilter.Items.Add("Tất cả");
+        private void SetupFilterControls()
+        {
+            if (!DesignMode)
+            {
+                // --- DANH MỤC ---
+                if (cboDanhMucFilter != null)
+                {
+                    try
+                    {
+                        var danhMucList = _danhMucRepo.GetAll();
+                        cboDanhMucFilter.Items.Clear();
+                        cboDanhMucFilter.Items.Add("Tất cả");
+                        if (danhMucList != null && danhMucList.Rows.Count > 0)
+                        {
+                            foreach (DataRow row in danhMucList.Rows)
+                                cboDanhMucFilter.Items.Add(row["TenDanhMuc"].ToString());
+                        }
+                        cboDanhMucFilter.SelectedIndex = 0;
+                    }
+                    catch { cboDanhMucFilter.Items.Add("Tất cả"); cboDanhMucFilter.SelectedIndex = 0; }
+                }
 
-        //            if (danhMucList != null && danhMucList.Rows.Count > 0)
-        //            {
-        //                foreach (DataRow row in danhMucList.Rows)
-        //                {
-        //                    if (row["TenDanhMuc"] != null)
-        //                        cboDanhMucFilter.Items.Add(row["TenDanhMuc"].ToString());
-        //                }
-        //            }
-        //            cboDanhMucFilter.SelectedIndex = 0;
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            Console.WriteLine($"Lỗi SetupFilterControls: {ex.Message}");
-        //            // Fallback an toàn
-        //            cboDanhMucFilter.Items.Clear();
-        //            cboDanhMucFilter.Items.Add("Tất cả");
-        //            cboDanhMucFilter.SelectedIndex = 0;
-        //        }
-        //    }
-        //}
+                // --- TÌNH TRẠNG ---
+                if (cboTinhTrangFilter != null)
+                {
+                    cboTinhTrangFilter.Items.Clear();
+                    cboTinhTrangFilter.Items.Add("Tất cả");
+                    cboTinhTrangFilter.Items.Add("Còn hàng");
+                    cboTinhTrangFilter.Items.Add("Hết hàng");
+                    cboTinhTrangFilter.Items.Add("Ngừng sản xuất");
+                    cboTinhTrangFilter.SelectedIndex = 0;
+                }
+
+                // --- KHOẢNG GIÁ ---
+                if (cboGiaFilter != null)
+                {
+                    cboGiaFilter.Items.Clear();
+                    cboGiaFilter.Items.Add("Tất cả");
+                    cboGiaFilter.Items.Add("Dưới 1 triệu");
+                    cboGiaFilter.Items.Add("1 triệu - 5 triệu");
+                    cboGiaFilter.Items.Add("5 triệu - 10 triệu");
+                    cboGiaFilter.Items.Add("Trên 10 triệu");
+                    cboGiaFilter.SelectedIndex = 0;
+                }
+            }
+        }
+
+
 
         // Add this method to the UC_QuanLySanPham class
         private void SetupSearchPlaceholder()
@@ -863,6 +889,76 @@ namespace QLCuaHangNoiThat.UserControls
         private void dataGridView1_SelectionChanged(object sender, EventArgs e)
         {
             // You can implement your logic here, or leave it empty if not needed
+        }
+        private void ApplyFilters()
+        {
+            try
+            {
+                string danhMuc = cboDanhMucFilter.SelectedItem?.ToString() ?? "Tất cả";
+                string tinhTrang = cboTinhTrangFilter.SelectedItem?.ToString() ?? "Tất cả";
+                string gia = cboGiaFilter.SelectedItem?.ToString() ?? "Tất cả";
+
+                DataTable dt = _repo.GetAllWithDanhMuc();
+
+                if (dt == null || dt.Rows.Count == 0)
+                {
+                    ShowSampleData();
+                    return;
+                }
+
+                // Lọc Danh Mục
+                if (danhMuc != "Tất cả")
+                    dt = dt.AsEnumerable().Where(r => r.Field<string>("DanhMuc") == danhMuc).CopyToDataTable();
+
+                // Lọc Tình Trạng
+                if (tinhTrang != "Tất cả")
+                    dt = dt.AsEnumerable().Where(r => r.Field<string>("TinhTrang") == tinhTrang).CopyToDataTable();
+
+                // Lọc Giá
+                if (gia != "Tất cả")
+                {
+                    switch (gia)
+                    {
+                        case "Dưới 1 triệu":
+                            dt = dt.AsEnumerable().Where(r => r.Field<decimal>("Gia") < 1000000).CopyToDataTable();
+                            break;
+                        case "1 triệu - 5 triệu":
+                            dt = dt.AsEnumerable().Where(r => r.Field<decimal>("Gia") >= 1000000 && r.Field<decimal>("Gia") <= 5000000).CopyToDataTable();
+                            break;
+                        case "5 triệu - 10 triệu":
+                            dt = dt.AsEnumerable().Where(r => r.Field<decimal>("Gia") > 5000000 && r.Field<decimal>("Gia") <= 10000000).CopyToDataTable();
+                            break;
+                        case "Trên 10 triệu":
+                            dt = dt.AsEnumerable().Where(r => r.Field<decimal>("Gia") > 10000000).CopyToDataTable();
+                            break;
+                    }
+                }
+
+                // Xử lý ảnh giống LoadData
+                if (!dt.Columns.Contains("HinhAnh"))
+                    dt.Columns.Add("HinhAnh", typeof(Image));
+
+                foreach (DataRow row in dt.Rows)
+                {
+                    string hinhAnhURL = row["HinhAnhURL"]?.ToString();
+                    Image img;
+                    if (!string.IsNullOrEmpty(hinhAnhURL) && File.Exists(hinhAnhURL))
+                    {
+                        try { img = ResizeImage(Image.FromFile(hinhAnhURL), 70, 70); }
+                        catch { img = CreateDefaultImage(); }
+                    }
+                    else img = CreateDefaultImage();
+
+                    row["HinhAnh"] = img;
+                }
+
+                SetupDataGridViewColumns();
+                dataGridView1.DataSource = dt;
+            }
+            catch
+            {
+                dataGridView1.DataSource = null;
+            }
         }
 
         // QLCuaHangNoiThat\UserControls\UC_QuanLySanPham.cs
