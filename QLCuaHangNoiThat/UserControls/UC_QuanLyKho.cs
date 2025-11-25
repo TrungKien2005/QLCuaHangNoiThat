@@ -21,11 +21,42 @@ namespace QLCuaHangNoiThat.UserControls
         {
             InitializeComponent();
             this.Load += UC_QuanLyKho_Load;
-
+            SetupButtonStyle(btnThemKho, Color.FromArgb(39, 174, 96));
+            SetupButtonStyle(btnSuaKho, Color.FromArgb(243, 156, 18));
+            SetupButtonStyle(btnXoaKho, Color.FromArgb(231, 76, 60));
+            btnThemKho.Cursor = Cursors.Hand;
+            btnSuaKho.Cursor = Cursors.Hand;
+            btnXoaKho.Cursor = Cursors.Hand;
             // Đăng ký lắng nghe sự kiện tồn kho thay đổi
             KhoService.TonKhoChanged += KhoService_TonKhoChanged;
         }
+        private void SetupButtonStyle(Button btn, Color backColor)
+        {
+            btn.FlatStyle = FlatStyle.Flat;
+            btn.BackColor = backColor;
+            btn.ForeColor = Color.White;
+            btn.FlatAppearance.BorderSize = 0;
+            btn.Font = new Font("Segoe UI", 10F, FontStyle.Bold); // Nên thống nhất Font
+            if (btn.Name == "btnXemLichSu")
+            {
+                // 1. Gán Icon (giả sử tên resource là HistoryIcon)
+                // Thay Resources.HistoryIcon bằng tên tài nguyên bạn đã import
 
+                // 2. Icon nằm ở bên trái
+                btn.ImageAlign = ContentAlignment.MiddleLeft;
+
+                // 3. Chữ nằm ở giữa bên phải
+                btn.TextAlign = ContentAlignment.MiddleCenter;
+
+                // 4. Thiết lập mối quan hệ giữa chữ và icon
+                // ImageAndText: Icon và chữ hiển thị cạnh nhau
+                btn.TextImageRelation = TextImageRelation.ImageBeforeText;
+
+                // 5. Thêm padding (khoảng đệm) để Icon không quá sát viền và chữ không quá sát Icon
+                // Padding(left, top, right, bottom)
+                btn.Padding = new Padding(10, 0, 10, 0);
+            }
+        }
         private void UC_QuanLyKho_Load(object sender, EventArgs e)
         {
             connection = new MySqlConnection(connectionString);
@@ -203,8 +234,7 @@ namespace QLCuaHangNoiThat.UserControls
         {
             if (dgvKho.CurrentRow == null) return;
 
-            txtTenKho.Text = dgvKho.CurrentRow.Cells["TenKho"].Value.ToString();
-            txtDiaChiKho.Text = dgvKho.CurrentRow.Cells["DiaChi"].Value.ToString();
+            
         }
 
         // Các hàm LoadKho, LoadNhaCungCap, CRUD NCC giữ nguyên như bạn đã viết
