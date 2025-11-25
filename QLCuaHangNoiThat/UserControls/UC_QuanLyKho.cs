@@ -6,6 +6,7 @@ using MySql.Data.MySqlClient;
 using QLCuaHangNoiThat.Repositories;
 using QLCuaHangNoiThat.Services;
 using QLCuaHangNoiThat.Models;
+using QLCuaHangNoiThat.Forms;
 
 namespace QLCuaHangNoiThat.UserControls
 {
@@ -215,27 +216,92 @@ namespace QLCuaHangNoiThat.UserControls
         }
         private void btnThemKho_Click(object sender, EventArgs e)
         {
-            // Code thêm kho
-            MessageBox.Show("Thêm kho được click");
+            FormKho frm = new FormKho();  // form thêm
+
+            if (frm.ShowDialog() == DialogResult.OK)
+            {
+                bool ok = _khoService.ThemKho(frm.KhoInfo);
+
+                if (ok)
+                {
+                    MessageBox.Show("Thêm kho thành công!");
+                    LoadKho();
+                }
+                else
+                {
+                    MessageBox.Show("Không thể thêm kho!");
+                }
+            }
         }
 
         private void btnSuaKho_Click(object sender, EventArgs e)
         {
-            // Code sửa kho
-            MessageBox.Show("Sửa kho được click");
+            if (dgvKho.CurrentRow == null)
+            {
+                MessageBox.Show("Vui lòng chọn kho cần sửa!");
+                return;
+            }
+
+            var kho = new Kho
+            {
+                MaKho = Convert.ToInt32(dgvKho.CurrentRow.Cells["MaKho"].Value),
+                TenKho = dgvKho.CurrentRow.Cells["TenKho"].Value.ToString(),
+                DiaChi = dgvKho.CurrentRow.Cells["DiaChi"].Value.ToString()
+            };
+
+            FormKho frm = new FormKho(kho);  // form sửa
+
+            if (frm.ShowDialog() == DialogResult.OK)
+            {
+                bool ok = _khoService.SuaKho(frm.KhoInfo);
+
+                if (ok)
+                {
+                    MessageBox.Show("Cập nhật kho thành công!");
+                    LoadKho();
+                }
+                else
+                {
+                    MessageBox.Show("Không thể cập nhật kho!");
+                }
+            }
         }
 
         private void btnXoaKho_Click(object sender, EventArgs e)
         {
-            // Code xóa kho
-            MessageBox.Show("Xóa kho được click");
+            if (dgvKho.CurrentRow == null)
+            {
+                MessageBox.Show("Vui lòng chọn kho cần xóa!");
+                return;
+            }
+
+            int maKho = Convert.ToInt32(dgvKho.CurrentRow.Cells["MaKho"].Value);
+
+            if (MessageBox.Show("Bạn có chắc chắn muốn xóa kho này?",
+                "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+            {
+                bool ok = _khoService.XoaKho(maKho);
+
+                if (ok)
+                {
+                    MessageBox.Show("Xóa kho thành công!");
+                    LoadKho();
+                }
+                else
+                {
+                    MessageBox.Show("Không thể xóa kho!");
+                }
+            }
         }
+
         private void dgvKho_SelectionChanged(object sender, EventArgs e)
         {
             if (dgvKho.CurrentRow == null) return;
 
             
         }
+     
+
 
         // Các hàm LoadKho, LoadNhaCungCap, CRUD NCC giữ nguyên như bạn đã viết
     }

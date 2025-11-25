@@ -14,6 +14,7 @@ namespace QLCuaHangNoiThat.Services
         private readonly PhieuNhapKhoRepository _phieuNhapRepo = new PhieuNhapKhoRepository();
         private readonly PhieuXuatKhoRepository _phieuXuatRepo = new PhieuXuatKhoRepository();
         private readonly TonKhoRepository _tonKhoRepo = new TonKhoRepository();
+        private readonly KhoRepository repository = new KhoRepository();
 
         // Sự kiện để UC_QuanLyKho subscribe, refresh realtime
         public static event Action TonKhoChanged;
@@ -209,5 +210,20 @@ public bool NhapHang(PhieuNhapKho phieu, int maSanPham, int soLuong, decimal don
                 return cmd.ExecuteNonQuery() > 0;
             }
         }
+        public bool ThemKho(Kho kho)
+        {
+            return repository.ThemKho(kho);
+        }
+
+        public bool SuaKho(Kho kho)
+        {
+            return repository.SuaKho(kho);
+        }
+
+        public bool XoaKho(int maKho)
+        {
+            return repository.XoaKho(maKho);
+        }
+
     }
 }

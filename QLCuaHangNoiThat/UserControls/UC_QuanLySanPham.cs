@@ -864,6 +864,7 @@ namespace QLCuaHangNoiThat.UserControls
         {
             // You can implement your logic here, or leave it empty if not needed
         }
+
         // QLCuaHangNoiThat\UserControls\UC_QuanLySanPham.cs
 
 
